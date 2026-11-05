@@ -1,0 +1,434 @@
+[
+  {
+    "id": "vcb-notification-transfer-in-004",
+    "origin": "anonymized_real_vietcombank_notification",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Số dư TK VCB 9000000001 +80,000 VND lúc 14-10-2026 12:47:59. Số dư 1,159,903 VND. Ref 9000TPBVI0000001.NGUYEN VAN A chuyen khoan nhanh qua Zalo.20261014.124758.90000000001.NGUYEN VAN A.970423",
+      "observedAt": "2026-10-14T12:48:04+07:00"
+    },
+    "expected": {
+      "amount": 80000,
+      "direction": "IN",
+      "transaction_time": "2026-10-14T12:47:59+07:00",
+      "reference_code": "9000TPBVI0000001",
+      "merchant_name": "NGUYEN VAN A",
+      "parser_rule": "vcb-notification-v1"
+    }
+  },
+  {
+    "id": "vcb-notification-momo-in-006",
+    "origin": "anonymized_real_vietcombank_notification",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Số dư TK VCB 9000000001 +500,000 VND lúc 11-10-2026 10:35:48. Số dư 1,714,958 VND. Ref PARTNER.DIRECT_DEBITS_VCB.MSE.900000000001.20261011.900000000001-0900000001_NGUYEN VAN A chuyen tien qua MoMo",
+      "observedAt": "2026-10-11T10:35:53+07:00"
+    },
+    "expected": {
+      "amount": 500000,
+      "direction": "IN",
+      "transaction_time": "2026-10-11T10:35:48+07:00",
+      "reference_code": "PARTNER.DIRECT_DEBITS_VCB.MSE.900000000001",
+      "merchant_name": "MOMO",
+      "parser_rule": "vcb-notification-v1"
+    }
+  },
+  {
+    "id": "vcb-notification-napas-in-007",
+    "origin": "anonymized_real_vietcombank_notification",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Số dư TK VCB 9000000001 +1,000,000 VND lúc 07-10-2026 09:30:50. Số dư 1,324,958 VND. Ref 9000IBT1K2AAAAAA.NGUYEN VAN C chuyen FT26000000000001.20261007.093049.90000000000001.VND-TGTT-NGUYEN VAN C.970407",
+      "observedAt": "2026-10-07T09:30:55+07:00"
+    },
+    "expected": {
+      "amount": 1000000,
+      "direction": "IN",
+      "transaction_time": "2026-10-07T09:30:50+07:00",
+      "reference_code": "9000IBT1K2AAAAAA",
+      "merchant_name": "NGUYEN VAN C",
+      "parser_rule": "vcb-notification-v1"
+    }
+  },
+  {
+    "id": "vcb-notification-napas-in-008",
+    "origin": "anonymized_real_vietcombank_notification",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Số dư TK VCB 9000000001 +300,000 VND lúc 24-09-2026 15:03:53. Số dư 324,900 VND. Ref 9000IBT1K2BBBBBB.NGUYEN VAN C chuyen FT26000000000002.20260924.150352.90000000000001.VND-TGTT-NGUYEN VAN C.970407",
+      "observedAt": "2026-09-24T15:03:58+07:00"
+    },
+    "expected": {
+      "amount": 300000,
+      "direction": "IN",
+      "transaction_time": "2026-09-24T15:03:53+07:00",
+      "reference_code": "9000IBT1K2BBBBBB",
+      "merchant_name": "NGUYEN VAN C",
+      "parser_rule": "vcb-notification-v1"
+    }
+  },
+  {
+    "id": "vcb-email-out-001",
+    "origin": "anonymized_real_vietcombank_email",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "EMAIL",
+      "rawText": "Biên lai chuyển tiền qua tài khoản (Payment Receipt)\nNgày, giờ giao dịch Trans. Date, Time: 10:51 Thứ Tư 14/10/2026\nSố lệnh giao dịch Order Number: 90000000001\nTài khoản nguồn Debit Account: 9000000001\nTên người chuyển tiền Remitter’s name: NGUYEN VAN A\nTài khoản người hưởng Credit Account: 9000000002\nTên người hưởng Beneficiary Name: NGUYEN VAN B\nTên ngân hàng hưởng Beneficiary Bank Name: Ngân hàng Kỹ thương Việt Nam\nSố tiền Amount: 40,000 VND\nLoại phí Charge Code: Người chuyển trả Exclude\nSố tiền phí Charge Amount Net income VAT: 0 VND 0 VND 0 VND\nNội dung chuyển tiền Details of Payment: Synthetic transfer",
+      "observedAt": "2026-10-14T10:51:43+07:00"
+    },
+    "expected": {
+      "amount": 40000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-14T10:51:00+07:00",
+      "reference_code": "90000000001",
+      "merchant_name": "NGUYEN VAN B",
+      "parser_rule": "vcb-email-v1"
+    }
+  },
+  {
+    "id": "vcb-email-out-002",
+    "origin": "anonymized_real_vietcombank_email",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "EMAIL",
+      "rawText": "Biên lai chuyển tiền qua tài khoản (Payment Receipt)\nNgày, giờ giao dịch Trans. Date, Time: 21:14 Thứ Hai 12/10/2026\nSố lệnh giao dịch Order Number: 90000000002\nTài khoản nguồn Debit Account: 9000000001\nTên người chuyển tiền Remitter’s name: NGUYEN VAN A\nTài khoản người hưởng Credit Account: 99MM25044M00000002\nTên người hưởng Beneficiary Name: MOMO_CUA HANG A_NGUYEN VAN C\nTên ngân hàng hưởng Beneficiary Bank Name: Ngân hàng Bản Việt\nSố tiền Amount: 72,000 VND\nLoại phí Charge Code: Người chuyển trả Exclude\nSố tiền phí Charge Amount Net income VAT: 0 VND 0 VND 0 VND\nNội dung chuyển tiền Details of Payment: Synthetic transfer",
+      "observedAt": "2026-10-12T21:14:15+07:00"
+    },
+    "expected": {
+      "amount": 72000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-12T21:14:00+07:00",
+      "reference_code": "90000000002",
+      "merchant_name": "MOMO_CUA HANG A_NGUYEN VAN C",
+      "parser_rule": "vcb-email-v1"
+    }
+  },
+  {
+    "id": "vcb-email-out-003",
+    "origin": "anonymized_real_vietcombank_email",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "EMAIL",
+      "rawText": "Biên lai chuyển tiền qua tài khoản (Payment Receipt)\nNgày, giờ giao dịch Trans. Date, Time: 19:31 Chủ Nhật 11/10/2026\nSố lệnh giao dịch Order Number: 90000000003\nTài khoản nguồn Debit Account: 9000000001\nTên người chuyển tiền Remitter’s name: NGUYEN VAN A\nTài khoản người hưởng Credit Account: VPLX01000001\nTên người hưởng Beneficiary Name: CUA HANG XANG A\nTên ngân hàng hưởng Beneficiary Bank Name: Ngân hàng Phát triển TP.HCM\nSố tiền Amount: 115,000 VND\nLoại phí Charge Code: Người chuyển trả Exclude\nSố tiền phí Charge Amount Net income VAT: 0 VND 0 VND 0 VND\nNội dung chuyển tiền Details of Payment: Synthetic purchase",
+      "observedAt": "2026-10-11T19:31:41+07:00"
+    },
+    "expected": {
+      "amount": 115000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-11T19:31:00+07:00",
+      "reference_code": "90000000003",
+      "merchant_name": "CUA HANG XANG A",
+      "parser_rule": "vcb-email-v1"
+    }
+  },
+  {
+    "id": "vcb-email-out-004",
+    "origin": "anonymized_real_vietcombank_email",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "EMAIL",
+      "rawText": "Biên lai chuyển tiền qua tài khoản (Payment Receipt)\nNgày, giờ giao dịch Trans. Date, Time: 19:17 Thứ Tư 07/10/2026\nSố lệnh giao dịch Order Number: 90000000004\nTài khoản nguồn Debit Account: 9000000001\nTên người chuyển tiền Remitter’s name: NGUYEN VAN A\nTài khoản người hưởng Credit Account: VQRQAFGLK0001\nTên người hưởng Beneficiary Name: NGUYEN VAN D\nTên ngân hàng hưởng Beneficiary Bank Name: Ngân hàng Quân Đội\nSố tiền Amount: 110,000 VND\nLoại phí Charge Code: Người chuyển trả Exclude\nSố tiền phí Charge Amount Net income VAT: 0 VND 0 VND 0 VND\nNội dung chuyển tiền Details of Payment: SYNTHETIC00000001",
+      "observedAt": "2026-10-07T19:17:21+07:00"
+    },
+    "expected": {
+      "amount": 110000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-07T19:17:00+07:00",
+      "reference_code": "90000000004",
+      "merchant_name": "NGUYEN VAN D",
+      "parser_rule": "vcb-email-v1"
+    }
+  },
+  {
+    "id": "mb-notification-cod-in-001",
+    "origin": "anonymized_real_mbbank_notification",
+    "input": {
+      "source": "MBBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Thông báo biến động số dư\nTK 90xxx001|GD: +554,650VND 28/10/26 12:20 |SD: 586,650VND|ND: Giaohangtietkiem chuyen tien CoD 28 10 2026 S90000001 BC9000000001 S90000001 281026",
+      "observedAt": "2026-10-28T12:20:05+07:00"
+    },
+    "expected": {
+      "amount": 554650,
+      "direction": "IN",
+      "transaction_time": "2026-10-28T12:20:00+07:00",
+      "reference_code": "BC9000000001",
+      "merchant_name": "GIAOHANGTIETKIEM",
+      "parser_rule": "mbbank-notification-v1"
+    }
+  },
+  {
+    "id": "mb-notification-cod-in-006",
+    "origin": "anonymized_real_mbbank_notification",
+    "input": {
+      "source": "MBBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Thông báo biến động số dư\nTK 90xxx001|GD: +978,900VND 07/10/26 11:47 |SD: 978,900VND|ND: Giaohangtietkiem chuyen tien CoD 07 10 2026 S90000001 BC9000000002 S90000001 071026",
+      "observedAt": "2026-10-07T11:47:05+07:00"
+    },
+    "expected": {
+      "amount": 978900,
+      "direction": "IN",
+      "transaction_time": "2026-10-07T11:47:00+07:00",
+      "reference_code": "BC9000000002",
+      "merchant_name": "GIAOHANGTIETKIEM",
+      "parser_rule": "mbbank-notification-v1"
+    }
+  },
+  {
+    "id": "mb-notification-momo-in-007",
+    "origin": "anonymized_real_mbbank_notification",
+    "input": {
+      "source": "MBBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Thông báo biến động số dư\nTK 90xxx001|GD: +100,000VND 25/10/26 16:15 |SD: 100,000VND|ND: 900000000001-NGUYEN VAN A chuyen tien qua MoMo-CHUYEN TIEN-ABC000000001-MOMO900000000001MOMO",
+      "observedAt": "2026-10-25T16:15:05+07:00"
+    },
+    "expected": {
+      "amount": 100000,
+      "direction": "IN",
+      "transaction_time": "2026-10-25T16:15:00+07:00",
+      "reference_code": "900000000001",
+      "merchant_name": "MOMO",
+      "parser_rule": "mbbank-notification-v1"
+    }
+  },
+  {
+    "id": "mb-notification-cod-in-008",
+    "origin": "anonymized_real_mbbank_notification",
+    "input": {
+      "source": "MBBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Thông báo biến động số dư\nTK 90xxx001|GD: +1,822,540VND 21/10/26 12:34 |SD: 1,822,540VND|ND: Giaohangtietkiem chuyen tien CoD 21 10 2026 S90000001 BC9000000003 S90000001 211026",
+      "observedAt": "2026-10-21T12:34:05+07:00"
+    },
+    "expected": {
+      "amount": 1822540,
+      "direction": "IN",
+      "transaction_time": "2026-10-21T12:34:00+07:00",
+      "reference_code": "BC9000000003",
+      "merchant_name": "GIAOHANGTIETKIEM",
+      "parser_rule": "mbbank-notification-v1"
+    }
+  },
+  {
+    "id": "mb-email-out-001",
+    "origin": "anonymized_real_mbbank_email",
+    "input": {
+      "source": "MBBANK",
+      "channel": "EMAIL",
+      "rawText": "Cảm ơn Quý khách đã sử dụng dịch vụ MB eBanking.\nMB xin thông báo giao dịch của Quý khách đã được thực hiện như sau:\nNgày, giờ giao dịch: 22-10-2026 19:22:14\nLoại giao dịch: Chuyển tiền nhanh ngoài MB\nSố tham chiếu: 90000000000000001\nTài khoản trích nợ: NGUYEN VAN A - 9000000001 (VND)\nNgười thụ hưởng: MOMO_NGUYEN VAN B - 99MM23XXXXXXXX0001\nSố tiền giao dịch: (VND) 1,822,540.00\nNội dung chuyển tiền: Synthetic transfer\nCách thức lệnh: Thanh toán ngay\nNgày nhập lệnh: 22-10-2026\nThời gian: 22-10-2026 19:22:14\nTình trạng: Giao dịch thành công",
+      "observedAt": "2026-10-22T20:32:48+07:00"
+    },
+    "expected": {
+      "amount": 1822540,
+      "direction": "OUT",
+      "transaction_time": "2026-10-22T19:22:14+07:00",
+      "reference_code": "90000000000000001",
+      "merchant_name": "MOMO",
+      "parser_rule": "mbbank-email-v1"
+    }
+  },
+  {
+    "id": "mb-email-out-002",
+    "origin": "anonymized_real_mbbank_email",
+    "input": {
+      "source": "MBBANK",
+      "channel": "EMAIL",
+      "rawText": "Cảm ơn Quý khách đã sử dụng dịch vụ MB eBanking.\nMB xin thông báo giao dịch của Quý khách đã được thực hiện như sau:\nNgày, giờ giao dịch: 20-10-2026 12:20:50\nLoại giao dịch: Chuyển tiền nhanh ngoài MB\nSố tham chiếu: 90000000000000002\nTài khoản trích nợ: NGUYEN VAN A - 9000000001 (VND)\nNgười thụ hưởng: MOMO_NGUYEN VAN B - 99MM23XXXXXXXX0001\nSố tiền giao dịch: (VND) 3,945,323.00\nNội dung chuyển tiền: Synthetic transfer\nCách thức lệnh: Thanh toán ngay\nNgày nhập lệnh: 20-10-2026\nThời gian: 20-10-2026 12:20:50\nTình trạng: Giao dịch thành công",
+      "observedAt": "2026-10-20T13:04:14+07:00"
+    },
+    "expected": {
+      "amount": 3945323,
+      "direction": "OUT",
+      "transaction_time": "2026-10-20T12:20:50+07:00",
+      "reference_code": "90000000000000002",
+      "merchant_name": "MOMO",
+      "parser_rule": "mbbank-email-v1"
+    }
+  },
+  {
+    "id": "mb-email-out-003",
+    "origin": "anonymized_real_mbbank_email",
+    "input": {
+      "source": "MBBANK",
+      "channel": "EMAIL",
+      "rawText": "Cảm ơn Quý khách đã sử dụng dịch vụ MB eBanking.\nMB xin thông báo giao dịch của Quý khách đã được thực hiện như sau:\nNgày, giờ giao dịch: 16-10-2026 13:59:03\nLoại giao dịch: Chuyển tiền nhanh ngoài MB\nSố tham chiếu: 90000000000000003\nTài khoản trích nợ: NGUYEN VAN A - 9000000001 (VND)\nNgười thụ hưởng: NGUYEN VAN C - 900000XXX0002\nSố tiền giao dịch: (VND) 1,280,000.00\nNội dung chuyển tiền: Synthetic transfer\nCách thức lệnh: Thanh toán ngay\nNgày nhập lệnh: 16-10-2026\nThời gian: 16-10-2026 13:59:03\nTình trạng: Giao dịch thành công",
+      "observedAt": "2026-10-16T15:55:23+07:00"
+    },
+    "expected": {
+      "amount": 1280000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-16T13:59:03+07:00",
+      "reference_code": "90000000000000003",
+      "merchant_name": "NGUYEN VAN C",
+      "parser_rule": "mbbank-email-v1"
+    }
+  },
+  {
+    "id": "mb-email-out-004",
+    "origin": "anonymized_real_mbbank_email",
+    "input": {
+      "source": "MBBANK",
+      "channel": "EMAIL",
+      "rawText": "Cảm ơn Quý khách đã sử dụng dịch vụ MB eBanking.\nMB xin thông báo giao dịch của Quý khách đã được thực hiện như sau:\nNgày, giờ giao dịch: 15-10-2026 07:01:01\nLoại giao dịch: Chuyển tiền nhanh ngoài MB\nSố tham chiếu: 90000000000000004\nTài khoản trích nợ: NGUYEN VAN A - 9000000001 (VND)\nNgười thụ hưởng: MOMO_NGUYEN VAN B - 99MM23XXXXXXXX0001\nSố tiền giao dịch: (VND) 7,420,000.00\nNội dung chuyển tiền: Synthetic transfer\nCách thức lệnh: Thanh toán ngay\nNgày nhập lệnh: 15-10-2026\nThời gian: 15-10-2026 07:01:01\nTình trạng: Giao dịch thành công",
+      "observedAt": "2026-10-15T07:01:26+07:00"
+    },
+    "expected": {
+      "amount": 7420000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-15T07:01:01+07:00",
+      "reference_code": "90000000000000004",
+      "merchant_name": "MOMO",
+      "parser_rule": "mbbank-email-v1"
+    }
+  },
+  {
+    "id": "momo-notification-in-001",
+    "origin": "anonymized_real_momo_notification",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Nhận chuyển khoản từ NGUYEN VAN A\nSố tiền 5.000 ₫ về Túi Thần Tài. Lời nhắn: \"NGUYEN VAN A chuyen tien.CT tu 9000000001 NGUYEN VAN A toi PSP2604112900000001 NGUYEN VAN B tai MoMo\".",
+      "observedAt": "2026-10-30T09:59:00.236+07:00"
+    },
+    "expected": {
+      "amount": 5000,
+      "direction": "IN",
+      "transaction_time": "2026-10-30T09:59:00.236+07:00",
+      "reference_code": null,
+      "merchant_name": "NGUYEN VAN A",
+      "parser_rule": "momo-v1"
+    }
+  },
+  {
+    "id": "momo-notification-in-002",
+    "origin": "anonymized_real_momo_notification",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Nhận chuyển khoản từ NGUYEN VAN A\nSố tiền 5.000 ₫ về Túi Thần Tài. Lời nhắn: \"NGUYEN VAN A chuyen tien.CT tu 9000000001 NGUYEN VAN A toi PSP2604112900000001 NGUYEN VAN B tai MoMo\".",
+      "observedAt": "2026-10-30T09:59:18.089+07:00"
+    },
+    "expected": {
+      "amount": 5000,
+      "direction": "IN",
+      "transaction_time": "2026-10-30T09:59:18.089+07:00",
+      "reference_code": null,
+      "merchant_name": "NGUYEN VAN A",
+      "parser_rule": "momo-v1"
+    }
+  },
+  {
+    "id": "momo-notification-in-003",
+    "origin": "anonymized_real_momo_notification",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Nhận chuyển khoản từ NGUYEN VAN A\nSố tiền 3.000 ₫ về Túi Thần Tài. Lời nhắn: \"NGUYEN VAN A chuyen tien.CT tu 9000000001 NGUYEN VAN A toi PSP2604112900000001 NGUYEN VAN B tai MoMo\".",
+      "observedAt": "2026-10-30T09:59:34.683+07:00"
+    },
+    "expected": {
+      "amount": 3000,
+      "direction": "IN",
+      "transaction_time": "2026-10-30T09:59:34.683+07:00",
+      "reference_code": null,
+      "merchant_name": "NGUYEN VAN A",
+      "parser_rule": "momo-v1"
+    }
+  },
+  {
+    "id": "momo-notification-in-004",
+    "origin": "anonymized_real_momo_notification",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Nhận chuyển khoản từ NGUYEN VAN A\nSố tiền 5.000 ₫ về Túi Thần Tài. Lời nhắn: \"NGUYEN VAN A chuyen tien.CT tu 9000000001 NGUYEN VAN A toi PSP2604112900000001 NGUYEN VAN B tai MoMo\".",
+      "observedAt": "2026-10-30T09:59:50.735+07:00"
+    },
+    "expected": {
+      "amount": 5000,
+      "direction": "IN",
+      "transaction_time": "2026-10-30T09:59:50.735+07:00",
+      "reference_code": null,
+      "merchant_name": "NGUYEN VAN A",
+      "parser_rule": "momo-v1"
+    }
+  },
+  {
+    "id": "momo-receipt-merchant-out-005",
+    "origin": "anonymized_transcription_from_real_momo_receipt",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Biên nhận giao dịch\nQUÁN ĂN AN BÌNH\n-35.000đ\nTrạng thái\nThành công\nThời gian\n10:38 - 30/10/2026\nMã giao dịch\n900000000001\nTài khoản/thẻ\nVietcombank\nCửa hàng\nQUÁN ĂN AN BÌNH\nNội dung\nNGUYEN VAN B Thanh toán cho QUÁN ĂN AN BÌNH\nMã đơn hàng\ngrc-MOMOHYZY20260218-aa000000-0000-4000-9000-000000000001",
+      "observedAt": "2026-10-30T10:38:05+07:00"
+    },
+    "expected": {
+      "amount": 35000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-30T10:38:00+07:00",
+      "reference_code": "900000000001",
+      "merchant_name": "QUÁN ĂN AN BÌNH",
+      "parser_rule": "momo-receipt-v1"
+    }
+  },
+  {
+    "id": "momo-receipt-mobile-data-out-006",
+    "origin": "anonymized_transcription_from_real_momo_receipt",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Biên nhận giao dịch\nNẠP DATA VINAPHONE\n-10.000đ\nTrạng thái\nThành công\nThời gian\n10:27 - 30/10/2026\nMã giao dịch\n900000000002\nTài khoản/thẻ\nTúi Thần Tài *\nSố điện thoại\n0900000001\nNhà mạng\nVinaphone\nGiá gói\n10.000đ\nDung lượng\n1GB\nChu kỳ\n1 ngày",
+      "observedAt": "2026-10-30T10:27:05+07:00"
+    },
+    "expected": {
+      "amount": 10000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-30T10:27:00+07:00",
+      "reference_code": "900000000002",
+      "merchant_name": "VINAPHONE",
+      "parser_rule": "momo-receipt-v1"
+    }
+  },
+  {
+    "id": "momo-receipt-bank-payment-out-007",
+    "origin": "anonymized_transcription_from_real_momo_receipt",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Biên nhận giao dịch\nTHANH TOÁN CHO NGUYEN VAN C (VIETINBANK)\n-90.000đ\nTrạng thái\nThành công\nThời gian\n21:06 - 29/10/2026\nMã giao dịch\n900000000003\nTài khoản/thẻ\nVietcombank\nSố thẻ/TK\n900000000001\nNgân hàng\nNgân hàng TMCP Công Thương Việt Nam\nNgười nhận\nNGUYEN VAN C\nSố tiền\n90.000đ\nTin nhắn\nNGUYEN VAN B chuyen tien qua MoMo",
+      "observedAt": "2026-10-29T21:06:05+07:00"
+    },
+    "expected": {
+      "amount": 90000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-29T21:06:00+07:00",
+      "reference_code": "900000000003",
+      "merchant_name": "NGUYEN VAN C",
+      "parser_rule": "momo-receipt-v1"
+    }
+  },
+  {
+    "id": "momo-receipt-bank-transfer-out-008",
+    "origin": "anonymized_transcription_from_real_momo_receipt",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Biên nhận giao dịch\nCHUYỂN ĐẾN NGUYEN VAN D (VIETCOMBANK)\n-10.000đ\nTrạng thái\nThành công\nThời gian\n19:53 - 30/10/2026\nMã giao dịch\n900000000004\nTài khoản/thẻ\nTúi Thần Tài *\nSố thẻ/TK\n9000000002\nNgân hàng\nNgân hàng TMCP Ngoại thương Việt Nam\nNgười nhận\nNGUYEN VAN D\nSố tiền\n10.000đ\nTin nhắn\nNGUYEN VAN B chuyen tien qua MoMo\nTên gợi nhớ\nNGUOI NHAN D",
+      "observedAt": "2026-10-30T19:53:05+07:00"
+    },
+    "expected": {
+      "amount": 10000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-30T19:53:00+07:00",
+      "reference_code": "900000000004",
+      "merchant_name": "NGUYEN VAN D",
+      "parser_rule": "momo-receipt-v1"
+    }
+  }
+]

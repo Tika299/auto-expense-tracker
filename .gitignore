@@ -1,0 +1,33 @@
+# Dependencies and generated output
+node_modules/
+coverage/
+dist/
+build/
+*.tsbuildinfo
+*.log
+
+# Environment files and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p8
+*.p12
+*.jks
+*.keystore
+
+# Raw financial data must never be committed
+fixtures-private/
+receipts-private/
+screenshots-private/
+captures-private/
+fixtures/raw/
+*.jsonl
+*.ndjson
+
+# Local editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

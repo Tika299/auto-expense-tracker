@@ -1,0 +1,146 @@
+[
+  {
+    "id": "mb-notification-cod-in-001",
+    "origin": "anonymized_real_mbbank_notification",
+    "input": {
+      "source": "MBBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Thông báo biến động số dư\nTK 90xxx001|GD: +554,650VND 28/10/26 12:20 |SD: 586,650VND|ND: Giaohangtietkiem chuyen tien CoD 28 10 2026 S90000001 BC9000000001 S90000001 281026",
+      "observedAt": "2026-10-28T12:20:05+07:00"
+    },
+    "expected": {
+      "amount": 554650,
+      "direction": "IN",
+      "transaction_time": "2026-10-28T12:20:00+07:00",
+      "reference_code": "BC9000000001",
+      "merchant_name": "GIAOHANGTIETKIEM",
+      "parser_rule": "mbbank-notification-v1"
+    }
+  },
+  {
+    "id": "mb-notification-card-out-002",
+    "origin": "anonymized_real_mbbank_notification",
+    "input": {
+      "source": "MBBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Thông báo biến động số dư\nMB [JCB]:SD THE [900000....0001]\nNgày GD: [2026-10-25 09:16:31]\nSố tiền GD: -68,000 VND\nTKTT: 9000000001\nNội dung GD: Giao dịch chi tiêu tại DICH VU A",
+      "observedAt": "2026-10-25T09:16:35+07:00"
+    },
+    "expected": {
+      "amount": 68000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-25T09:16:31+07:00",
+      "reference_code": null,
+      "merchant_name": "DICH VU A",
+      "parser_rule": "mbbank-card-v1"
+    }
+  },
+  {
+    "id": "mb-notification-momo-out-003",
+    "origin": "anonymized_real_mbbank_notification",
+    "input": {
+      "source": "MBBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Thông báo biến động số dư\nTK 90xxx001|GD: -1,822,540VND 22/10/26 19:22 |SD: 0VND|DEN: MOMO - 99MM23309M00000001|ND: MBCT NGUYEN VAN A chuyen tien SYNTHETIC/000001",
+      "observedAt": "2026-10-22T19:22:05+07:00"
+    },
+    "expected": {
+      "amount": 1822540,
+      "direction": "OUT",
+      "transaction_time": "2026-10-22T19:22:00+07:00",
+      "reference_code": "99MM23309M00000001",
+      "merchant_name": "MOMO",
+      "parser_rule": "mbbank-notification-v1"
+    }
+  },
+  {
+    "id": "mb-notification-shop-out-004",
+    "origin": "anonymized_real_mbbank_notification",
+    "input": {
+      "source": "MBBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Thông báo biến động số dư\nTK 90xxx001|GD: -140,000VND 04/10/26 21:05 |SD: 9,862,120VND|DEN: CUA HANG B - PMC2618715300000001|ND: NGUYEN VAN A chuyen tien",
+      "observedAt": "2026-10-04T21:05:05+07:00"
+    },
+    "expected": {
+      "amount": 140000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-04T21:05:00+07:00",
+      "reference_code": "PMC2618715300000001",
+      "merchant_name": "CUA HANG B",
+      "parser_rule": "mbbank-notification-v1"
+    }
+  },
+  {
+    "id": "mb-notification-transfer-out-005",
+    "origin": "anonymized_real_mbbank_notification",
+    "input": {
+      "source": "MBBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Thông báo biến động số dư\nTK 90xxx001|GD: -100,000VND 03/10/26 11:11 |SD: 10,002,120VND|DEN: NGUOI NHAN C - 90000000QR9PA01|ND: NGUYEN VAN A chuyen tien",
+      "observedAt": "2026-10-03T11:11:05+07:00"
+    },
+    "expected": {
+      "amount": 100000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-03T11:11:00+07:00",
+      "reference_code": "90000000QR9PA01",
+      "merchant_name": "NGUOI NHAN C",
+      "parser_rule": "mbbank-notification-v1"
+    }
+  },
+  {
+    "id": "mb-notification-cod-in-006",
+    "origin": "anonymized_real_mbbank_notification",
+    "input": {
+      "source": "MBBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Thông báo biến động số dư\nTK 90xxx001|GD: +978,900VND 07/10/26 11:47 |SD: 978,900VND|ND: Giaohangtietkiem chuyen tien CoD 07 10 2026 S90000001 BC9000000002 S90000001 071026",
+      "observedAt": "2026-10-07T11:47:05+07:00"
+    },
+    "expected": {
+      "amount": 978900,
+      "direction": "IN",
+      "transaction_time": "2026-10-07T11:47:00+07:00",
+      "reference_code": "BC9000000002",
+      "merchant_name": "GIAOHANGTIETKIEM",
+      "parser_rule": "mbbank-notification-v1"
+    }
+  },
+  {
+    "id": "mb-notification-momo-in-007",
+    "origin": "anonymized_real_mbbank_notification",
+    "input": {
+      "source": "MBBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Thông báo biến động số dư\nTK 90xxx001|GD: +100,000VND 25/10/26 16:15 |SD: 100,000VND|ND: 900000000001-NGUYEN VAN A chuyen tien qua MoMo-CHUYEN TIEN-ABC000000001-MOMO900000000001MOMO",
+      "observedAt": "2026-10-25T16:15:05+07:00"
+    },
+    "expected": {
+      "amount": 100000,
+      "direction": "IN",
+      "transaction_time": "2026-10-25T16:15:00+07:00",
+      "reference_code": "900000000001",
+      "merchant_name": "MOMO",
+      "parser_rule": "mbbank-notification-v1"
+    }
+  },
+  {
+    "id": "mb-notification-cod-in-008",
+    "origin": "anonymized_real_mbbank_notification",
+    "input": {
+      "source": "MBBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Thông báo biến động số dư\nTK 90xxx001|GD: +1,822,540VND 21/10/26 12:34 |SD: 1,822,540VND|ND: Giaohangtietkiem chuyen tien CoD 21 10 2026 S90000001 BC9000000003 S90000001 211026",
+      "observedAt": "2026-10-21T12:34:05+07:00"
+    },
+    "expected": {
+      "amount": 1822540,
+      "direction": "IN",
+      "transaction_time": "2026-10-21T12:34:00+07:00",
+      "reference_code": "BC9000000003",
+      "merchant_name": "GIAOHANGTIETKIEM",
+      "parser_rule": "mbbank-notification-v1"
+    }
+  }
+]

@@ -1,0 +1,146 @@
+[
+  {
+    "id": "momo-notification-in-001",
+    "origin": "anonymized_real_momo_notification",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Nhận chuyển khoản từ NGUYEN VAN A\nSố tiền 5.000 ₫ về Túi Thần Tài. Lời nhắn: \"NGUYEN VAN A chuyen tien.CT tu 9000000001 NGUYEN VAN A toi PSP2604112900000001 NGUYEN VAN B tai MoMo\".",
+      "observedAt": "2026-10-30T09:59:00.236+07:00"
+    },
+    "expected": {
+      "amount": 5000,
+      "direction": "IN",
+      "transaction_time": "2026-10-30T09:59:00.236+07:00",
+      "reference_code": null,
+      "merchant_name": "NGUYEN VAN A",
+      "parser_rule": "momo-v1"
+    }
+  },
+  {
+    "id": "momo-notification-in-002",
+    "origin": "anonymized_real_momo_notification",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Nhận chuyển khoản từ NGUYEN VAN A\nSố tiền 5.000 ₫ về Túi Thần Tài. Lời nhắn: \"NGUYEN VAN A chuyen tien.CT tu 9000000001 NGUYEN VAN A toi PSP2604112900000001 NGUYEN VAN B tai MoMo\".",
+      "observedAt": "2026-10-30T09:59:18.089+07:00"
+    },
+    "expected": {
+      "amount": 5000,
+      "direction": "IN",
+      "transaction_time": "2026-10-30T09:59:18.089+07:00",
+      "reference_code": null,
+      "merchant_name": "NGUYEN VAN A",
+      "parser_rule": "momo-v1"
+    }
+  },
+  {
+    "id": "momo-notification-in-003",
+    "origin": "anonymized_real_momo_notification",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Nhận chuyển khoản từ NGUYEN VAN A\nSố tiền 3.000 ₫ về Túi Thần Tài. Lời nhắn: \"NGUYEN VAN A chuyen tien.CT tu 9000000001 NGUYEN VAN A toi PSP2604112900000001 NGUYEN VAN B tai MoMo\".",
+      "observedAt": "2026-10-30T09:59:34.683+07:00"
+    },
+    "expected": {
+      "amount": 3000,
+      "direction": "IN",
+      "transaction_time": "2026-10-30T09:59:34.683+07:00",
+      "reference_code": null,
+      "merchant_name": "NGUYEN VAN A",
+      "parser_rule": "momo-v1"
+    }
+  },
+  {
+    "id": "momo-notification-in-004",
+    "origin": "anonymized_real_momo_notification",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Nhận chuyển khoản từ NGUYEN VAN A\nSố tiền 5.000 ₫ về Túi Thần Tài. Lời nhắn: \"NGUYEN VAN A chuyen tien.CT tu 9000000001 NGUYEN VAN A toi PSP2604112900000001 NGUYEN VAN B tai MoMo\".",
+      "observedAt": "2026-10-30T09:59:50.735+07:00"
+    },
+    "expected": {
+      "amount": 5000,
+      "direction": "IN",
+      "transaction_time": "2026-10-30T09:59:50.735+07:00",
+      "reference_code": null,
+      "merchant_name": "NGUYEN VAN A",
+      "parser_rule": "momo-v1"
+    }
+  },
+  {
+    "id": "momo-receipt-merchant-out-005",
+    "origin": "anonymized_transcription_from_real_momo_receipt",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Biên nhận giao dịch\nQUÁN ĂN AN BÌNH\n-35.000đ\nTrạng thái\nThành công\nThời gian\n10:38 - 30/10/2026\nMã giao dịch\n900000000001\nTài khoản/thẻ\nVietcombank\nCửa hàng\nQUÁN ĂN AN BÌNH\nNội dung\nNGUYEN VAN B Thanh toán cho QUÁN ĂN AN BÌNH\nMã đơn hàng\ngrc-MOMOHYZY20260218-aa000000-0000-4000-9000-000000000001",
+      "observedAt": "2026-10-30T10:38:05+07:00"
+    },
+    "expected": {
+      "amount": 35000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-30T10:38:00+07:00",
+      "reference_code": "900000000001",
+      "merchant_name": "QUÁN ĂN AN BÌNH",
+      "parser_rule": "momo-receipt-v1"
+    }
+  },
+  {
+    "id": "momo-receipt-mobile-data-out-006",
+    "origin": "anonymized_transcription_from_real_momo_receipt",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Biên nhận giao dịch\nNẠP DATA VINAPHONE\n-10.000đ\nTrạng thái\nThành công\nThời gian\n10:27 - 30/10/2026\nMã giao dịch\n900000000002\nTài khoản/thẻ\nTúi Thần Tài *\nSố điện thoại\n0900000001\nNhà mạng\nVinaphone\nGiá gói\n10.000đ\nDung lượng\n1GB\nChu kỳ\n1 ngày",
+      "observedAt": "2026-10-30T10:27:05+07:00"
+    },
+    "expected": {
+      "amount": 10000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-30T10:27:00+07:00",
+      "reference_code": "900000000002",
+      "merchant_name": "VINAPHONE",
+      "parser_rule": "momo-receipt-v1"
+    }
+  },
+  {
+    "id": "momo-receipt-bank-payment-out-007",
+    "origin": "anonymized_transcription_from_real_momo_receipt",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Biên nhận giao dịch\nTHANH TOÁN CHO NGUYEN VAN C (VIETINBANK)\n-90.000đ\nTrạng thái\nThành công\nThời gian\n21:06 - 29/10/2026\nMã giao dịch\n900000000003\nTài khoản/thẻ\nVietcombank\nSố thẻ/TK\n900000000001\nNgân hàng\nNgân hàng TMCP Công Thương Việt Nam\nNgười nhận\nNGUYEN VAN C\nSố tiền\n90.000đ\nTin nhắn\nNGUYEN VAN B chuyen tien qua MoMo",
+      "observedAt": "2026-10-29T21:06:05+07:00"
+    },
+    "expected": {
+      "amount": 90000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-29T21:06:00+07:00",
+      "reference_code": "900000000003",
+      "merchant_name": "NGUYEN VAN C",
+      "parser_rule": "momo-receipt-v1"
+    }
+  },
+  {
+    "id": "momo-receipt-bank-transfer-out-008",
+    "origin": "anonymized_transcription_from_real_momo_receipt",
+    "input": {
+      "source": "MOMO",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Biên nhận giao dịch\nCHUYỂN ĐẾN NGUYEN VAN D (VIETCOMBANK)\n-10.000đ\nTrạng thái\nThành công\nThời gian\n19:53 - 30/10/2026\nMã giao dịch\n900000000004\nTài khoản/thẻ\nTúi Thần Tài *\nSố thẻ/TK\n9000000002\nNgân hàng\nNgân hàng TMCP Ngoại thương Việt Nam\nNgười nhận\nNGUYEN VAN D\nSố tiền\n10.000đ\nTin nhắn\nNGUYEN VAN B chuyen tien qua MoMo\nTên gợi nhớ\nNGUOI NHAN D",
+      "observedAt": "2026-10-30T19:53:05+07:00"
+    },
+    "expected": {
+      "amount": 10000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-30T19:53:00+07:00",
+      "reference_code": "900000000004",
+      "merchant_name": "NGUYEN VAN D",
+      "parser_rule": "momo-receipt-v1"
+    }
+  }
+]

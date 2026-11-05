@@ -1,0 +1,74 @@
+[
+  {
+    "id": "mb-email-out-001",
+    "origin": "anonymized_real_mbbank_email",
+    "input": {
+      "source": "MBBANK",
+      "channel": "EMAIL",
+      "rawText": "Cảm ơn Quý khách đã sử dụng dịch vụ MB eBanking.\nMB xin thông báo giao dịch của Quý khách đã được thực hiện như sau:\nNgày, giờ giao dịch: 22-10-2026 19:22:14\nLoại giao dịch: Chuyển tiền nhanh ngoài MB\nSố tham chiếu: 90000000000000001\nTài khoản trích nợ: NGUYEN VAN A - 9000000001 (VND)\nNgười thụ hưởng: MOMO_NGUYEN VAN B - 99MM23XXXXXXXX0001\nSố tiền giao dịch: (VND) 1,822,540.00\nNội dung chuyển tiền: Synthetic transfer\nCách thức lệnh: Thanh toán ngay\nNgày nhập lệnh: 22-10-2026\nThời gian: 22-10-2026 19:22:14\nTình trạng: Giao dịch thành công",
+      "observedAt": "2026-10-22T20:32:48+07:00"
+    },
+    "expected": {
+      "amount": 1822540,
+      "direction": "OUT",
+      "transaction_time": "2026-10-22T19:22:14+07:00",
+      "reference_code": "90000000000000001",
+      "merchant_name": "MOMO",
+      "parser_rule": "mbbank-email-v1"
+    }
+  },
+  {
+    "id": "mb-email-out-002",
+    "origin": "anonymized_real_mbbank_email",
+    "input": {
+      "source": "MBBANK",
+      "channel": "EMAIL",
+      "rawText": "Cảm ơn Quý khách đã sử dụng dịch vụ MB eBanking.\nMB xin thông báo giao dịch của Quý khách đã được thực hiện như sau:\nNgày, giờ giao dịch: 20-10-2026 12:20:50\nLoại giao dịch: Chuyển tiền nhanh ngoài MB\nSố tham chiếu: 90000000000000002\nTài khoản trích nợ: NGUYEN VAN A - 9000000001 (VND)\nNgười thụ hưởng: MOMO_NGUYEN VAN B - 99MM23XXXXXXXX0001\nSố tiền giao dịch: (VND) 3,945,323.00\nNội dung chuyển tiền: Synthetic transfer\nCách thức lệnh: Thanh toán ngay\nNgày nhập lệnh: 20-10-2026\nThời gian: 20-10-2026 12:20:50\nTình trạng: Giao dịch thành công",
+      "observedAt": "2026-10-20T13:04:14+07:00"
+    },
+    "expected": {
+      "amount": 3945323,
+      "direction": "OUT",
+      "transaction_time": "2026-10-20T12:20:50+07:00",
+      "reference_code": "90000000000000002",
+      "merchant_name": "MOMO",
+      "parser_rule": "mbbank-email-v1"
+    }
+  },
+  {
+    "id": "mb-email-out-003",
+    "origin": "anonymized_real_mbbank_email",
+    "input": {
+      "source": "MBBANK",
+      "channel": "EMAIL",
+      "rawText": "Cảm ơn Quý khách đã sử dụng dịch vụ MB eBanking.\nMB xin thông báo giao dịch của Quý khách đã được thực hiện như sau:\nNgày, giờ giao dịch: 16-10-2026 13:59:03\nLoại giao dịch: Chuyển tiền nhanh ngoài MB\nSố tham chiếu: 90000000000000003\nTài khoản trích nợ: NGUYEN VAN A - 9000000001 (VND)\nNgười thụ hưởng: NGUYEN VAN C - 900000XXX0002\nSố tiền giao dịch: (VND) 1,280,000.00\nNội dung chuyển tiền: Synthetic transfer\nCách thức lệnh: Thanh toán ngay\nNgày nhập lệnh: 16-10-2026\nThời gian: 16-10-2026 13:59:03\nTình trạng: Giao dịch thành công",
+      "observedAt": "2026-10-16T15:55:23+07:00"
+    },
+    "expected": {
+      "amount": 1280000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-16T13:59:03+07:00",
+      "reference_code": "90000000000000003",
+      "merchant_name": "NGUYEN VAN C",
+      "parser_rule": "mbbank-email-v1"
+    }
+  },
+  {
+    "id": "mb-email-out-004",
+    "origin": "anonymized_real_mbbank_email",
+    "input": {
+      "source": "MBBANK",
+      "channel": "EMAIL",
+      "rawText": "Cảm ơn Quý khách đã sử dụng dịch vụ MB eBanking.\nMB xin thông báo giao dịch của Quý khách đã được thực hiện như sau:\nNgày, giờ giao dịch: 15-10-2026 07:01:01\nLoại giao dịch: Chuyển tiền nhanh ngoài MB\nSố tham chiếu: 90000000000000004\nTài khoản trích nợ: NGUYEN VAN A - 9000000001 (VND)\nNgười thụ hưởng: MOMO_NGUYEN VAN B - 99MM23XXXXXXXX0001\nSố tiền giao dịch: (VND) 7,420,000.00\nNội dung chuyển tiền: Synthetic transfer\nCách thức lệnh: Thanh toán ngay\nNgày nhập lệnh: 15-10-2026\nThời gian: 15-10-2026 07:01:01\nTình trạng: Giao dịch thành công",
+      "observedAt": "2026-10-15T07:01:26+07:00"
+    },
+    "expected": {
+      "amount": 7420000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-15T07:01:01+07:00",
+      "reference_code": "90000000000000004",
+      "merchant_name": "MOMO",
+      "parser_rule": "mbbank-email-v1"
+    }
+  }
+]

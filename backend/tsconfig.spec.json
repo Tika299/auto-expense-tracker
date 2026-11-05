@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "rootDir": ".",
+    "noEmit": true,
+    "incremental": false
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts", "jest.config.ts"]
+}

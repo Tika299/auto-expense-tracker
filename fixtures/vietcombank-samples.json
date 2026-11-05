@@ -1,0 +1,146 @@
+[
+  {
+    "id": "vcb-notification-ecom-out-001",
+    "origin": "anonymized_real_vietcombank_notification",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Số dư TK VCB 9000000001 -106,000 VND lúc 27-10-2026 18:47:46. Số dư 2,006,782 VND. Ref Ecom.EW26102700000001.MOMO.0900000001.CashIn.000000000001",
+      "observedAt": "2026-10-27T18:47:51+07:00"
+    },
+    "expected": {
+      "amount": 106000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-27T18:47:46+07:00",
+      "reference_code": "Ecom.EW26102700000001",
+      "merchant_name": "MOMO",
+      "parser_rule": "vcb-notification-v1"
+    }
+  },
+  {
+    "id": "vcb-notification-atm-out-002",
+    "origin": "anonymized_real_vietcombank_notification",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Số dư TK VCB 9000000001 -501,100 VND lúc 24-10-2026 17:32:23. Số dư 1,742,703 VND. Ref ATM_CWD.90000001.000001.20261024.173223.900000...0001.900001.SYNTHETIC ATM LOCATION",
+      "observedAt": "2026-10-24T17:32:28+07:00"
+    },
+    "expected": {
+      "amount": 501100,
+      "direction": "OUT",
+      "transaction_time": "2026-10-24T17:32:23+07:00",
+      "reference_code": "ATM_CWD.90000001.000001",
+      "merchant_name": null,
+      "parser_rule": "vcb-notification-v1"
+    }
+  },
+  {
+    "id": "vcb-notification-qr-atm-out-003",
+    "origin": "anonymized_real_vietcombank_notification",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Số dư TK VCB 9000000001 -101,100 VND lúc 20-10-2026 16:55:02. Số dư 2,243,803 VND. Ref ATM_QRCWD.90000002.000002.20261020.165442. rut tien 9000000001 tai 90000000001",
+      "observedAt": "2026-10-20T16:55:07+07:00"
+    },
+    "expected": {
+      "amount": 101100,
+      "direction": "OUT",
+      "transaction_time": "2026-10-20T16:55:02+07:00",
+      "reference_code": "ATM_QRCWD.90000002.000002",
+      "merchant_name": null,
+      "parser_rule": "vcb-notification-v1"
+    }
+  },
+  {
+    "id": "vcb-notification-transfer-in-004",
+    "origin": "anonymized_real_vietcombank_notification",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Số dư TK VCB 9000000001 +80,000 VND lúc 14-10-2026 12:47:59. Số dư 1,159,903 VND. Ref 9000TPBVI0000001.NGUYEN VAN A chuyen khoan nhanh qua Zalo.20261014.124758.90000000001.NGUYEN VAN A.970423",
+      "observedAt": "2026-10-14T12:48:04+07:00"
+    },
+    "expected": {
+      "amount": 80000,
+      "direction": "IN",
+      "transaction_time": "2026-10-14T12:47:59+07:00",
+      "reference_code": "9000TPBVI0000001",
+      "merchant_name": "NGUYEN VAN A",
+      "parser_rule": "vcb-notification-v1"
+    }
+  },
+  {
+    "id": "vcb-notification-transfer-out-005",
+    "origin": "anonymized_real_vietcombank_notification",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Số dư TK VCB 9000000001 -40,000 VND lúc 14-10-2026 10:51:42. Số dư 1,079,903 VND. Ref MBVCB.90000000001.9000BFTV00000001.NGUYEN VAN A chuyen khoan nhanh qua Z....CT tu 9000000001 NGUYEN VAN A toi 9000000002 NGUYEN VAN B tai TECHCOMBANK",
+      "observedAt": "2026-10-14T10:51:47+07:00"
+    },
+    "expected": {
+      "amount": 40000,
+      "direction": "OUT",
+      "transaction_time": "2026-10-14T10:51:42+07:00",
+      "reference_code": "MBVCB.90000000001.9000BFTV00000001",
+      "merchant_name": "NGUYEN VAN B",
+      "parser_rule": "vcb-notification-v1"
+    }
+  },
+  {
+    "id": "vcb-notification-momo-in-006",
+    "origin": "anonymized_real_vietcombank_notification",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Số dư TK VCB 9000000001 +500,000 VND lúc 11-10-2026 10:35:48. Số dư 1,714,958 VND. Ref PARTNER.DIRECT_DEBITS_VCB.MSE.900000000001.20261011.900000000001-0900000001_NGUYEN VAN A chuyen tien qua MoMo",
+      "observedAt": "2026-10-11T10:35:53+07:00"
+    },
+    "expected": {
+      "amount": 500000,
+      "direction": "IN",
+      "transaction_time": "2026-10-11T10:35:48+07:00",
+      "reference_code": "PARTNER.DIRECT_DEBITS_VCB.MSE.900000000001",
+      "merchant_name": "MOMO",
+      "parser_rule": "vcb-notification-v1"
+    }
+  },
+  {
+    "id": "vcb-notification-napas-in-007",
+    "origin": "anonymized_real_vietcombank_notification",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Số dư TK VCB 9000000001 +1,000,000 VND lúc 07-10-2026 09:30:50. Số dư 1,324,958 VND. Ref 9000IBT1K2AAAAAA.NGUYEN VAN C chuyen FT26000000000001.20261007.093049.90000000000001.VND-TGTT-NGUYEN VAN C.970407",
+      "observedAt": "2026-10-07T09:30:55+07:00"
+    },
+    "expected": {
+      "amount": 1000000,
+      "direction": "IN",
+      "transaction_time": "2026-10-07T09:30:50+07:00",
+      "reference_code": "9000IBT1K2AAAAAA",
+      "merchant_name": "NGUYEN VAN C",
+      "parser_rule": "vcb-notification-v1"
+    }
+  },
+  {
+    "id": "vcb-notification-napas-in-008",
+    "origin": "anonymized_real_vietcombank_notification",
+    "input": {
+      "source": "VIETCOMBANK",
+      "channel": "ANDROID_NOTIFICATION",
+      "rawText": "Số dư TK VCB 9000000001 +300,000 VND lúc 24-09-2026 15:03:53. Số dư 324,900 VND. Ref 9000IBT1K2BBBBBB.NGUYEN VAN C chuyen FT26000000000002.20260924.150352.90000000000001.VND-TGTT-NGUYEN VAN C.970407",
+      "observedAt": "2026-09-24T15:03:58+07:00"
+    },
+    "expected": {
+      "amount": 300000,
+      "direction": "IN",
+      "transaction_time": "2026-09-24T15:03:53+07:00",
+      "reference_code": "9000IBT1K2BBBBBB",
+      "merchant_name": "NGUYEN VAN C",
+      "parser_rule": "vcb-notification-v1"
+    }
+  }
+]
