@@ -10,6 +10,7 @@ import { WalletsModule } from './wallets/wallets.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { ObservationsModule } from './observations/observations.module';
+import { ReportsModule } from './reports/reports.module';
 
 const envSchema = z.object({
   NODE_ENV: z
@@ -34,6 +35,7 @@ const envSchema = z.object({
     CategoriesModule,
     TransactionsModule,
     ObservationsModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

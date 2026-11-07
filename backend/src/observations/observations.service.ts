@@ -20,6 +20,7 @@ import { ParseError } from '../parser/types';
 import { CreateObservationDto } from './dto/create-observation.dto';
 import { DeduplicationService } from '../rule-engine/deduplication.service';
 import type { TransactionDeduplicationDecision } from '../rule-engine/deduplication.types';
+import { CategorizationService } from '../rule-engine/categorization.service';
 
 type ObservationRecord = typeof transactionObservations.$inferSelect;
 
@@ -30,6 +31,8 @@ export class ObservationsService {
     private readonly db: Database,
 
     private readonly deduplicationService: DeduplicationService,
+
+    private readonly categorizationService: CategorizationService,
   ) {}
 
   /**
@@ -121,12 +124,24 @@ export class ObservationsService {
     const pendingReview = decision.kind === 'PENDING_REVIEW';
 
     return this.db.transaction(async (tx) => {
+      const categorization = await this.categorizationService.categorize(
+        {
+          userId,
+          direction: parsed.direction,
+          kind: 'NORMAL',
+          reviewStatus: pendingReview ? 'PENDING_REVIEW' : 'CONFIRMED',
+          merchantName: parsed.merchant_name,
+          counterpartyAccount: null,
+          rawText: observation.rawText,
+        },
+        tx,
+      );
       const [createdTransaction] = await tx
         .insert(transactions)
         .values({
           userId,
           walletId: observation.walletId!,
-          categoryId: null,
+          categoryId: categorization.categoryId,
 
           amount: parsed.amount,
           direction: parsed.direction,
@@ -141,8 +156,8 @@ export class ObservationsService {
           kind: 'NORMAL',
           reviewStatus: pendingReview ? 'PENDING_REVIEW' : 'CONFIRMED',
 
-          categorizationSource: 'NONE',
-          matchedRuleId: null,
+          categorizationSource: categorization.source,
+          matchedRuleId: categorization.matchedRuleId,
 
           note: null,
           origin: 'PARSER',

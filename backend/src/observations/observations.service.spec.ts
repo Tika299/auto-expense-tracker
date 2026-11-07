@@ -88,6 +88,9 @@ describe('ObservationsService', () => {
   let db: any;
   let service: ObservationsService;
   let deduplicationService: any;
+  let categorizationService: {
+    categorize: jest.Mock;
+  };
 
   beforeEach(() => {
     db = {
@@ -111,29 +114,52 @@ describe('ObservationsService', () => {
       })),
     };
 
-    service = new ObservationsService(db, deduplicationService);
+    categorizationService = {
+      categorize: jest.fn(async () => ({
+        categoryId: null,
+        source: 'NONE',
+        matchedRuleId: null,
+      })),
+    };
+
+    service = new ObservationsService(
+      db,
+      deduplicationService as any,
+      categorizationService as any,
+    );
   });
 
-  function mockSuccessfulTransaction() {
+  function mockSuccessfulTransaction(overrides: Record<string, unknown> = {}) {
     const createdTransaction = {
       id: transactionId,
       userId,
       walletId,
+
+      categoryId: null,
+
       amount: 80000,
       direction: 'IN',
 
       kind: 'NORMAL',
       reviewStatus: 'CONFIRMED',
+
       categorizationSource: 'NONE',
+      matchedRuleId: null,
 
       origin: 'PARSER',
+
+      // Test có thể truyền giá trị khác để ghi đè.
+      ...overrides,
     };
+
     const parsedObservation = {
       ...makeObservation('PARSED'),
       transactionId,
     };
+
     const txInsert = insertChain([createdTransaction]);
     const txUpdate = updateChain([parsedObservation]);
+
     const tx = {
       insert: jest.fn(() => txInsert),
       update: jest.fn(() => txUpdate),
@@ -143,7 +169,12 @@ describe('ObservationsService', () => {
       callback(tx),
     );
 
-    return { createdTransaction, parsedObservation, txInsert, txUpdate };
+    return {
+      createdTransaction,
+      parsedObservation,
+      txInsert,
+      txUpdate,
+    };
   }
 
   it('stores a valid observation and creates a PARSER transaction', async () => {
@@ -330,11 +361,18 @@ describe('ObservationsService', () => {
       id: 'new-transaction-id',
       userId,
       walletId,
+
+      categoryId: null,
+
       amount: 80000,
       direction: 'IN',
+
       kind: 'NORMAL',
       reviewStatus: 'PENDING_REVIEW',
+
       categorizationSource: 'NONE',
+      matchedRuleId: null,
+
       origin: 'PARSER',
     };
 
@@ -424,5 +462,70 @@ describe('ObservationsService', () => {
         transactionId: pendingTransaction.id,
       }),
     );
+  });
+
+  it('stores categorization result on parsed transaction', async () => {
+    const categoryId = '11111111-1111-4111-8111-111111111111';
+
+    const pendingObservation = makeObservation();
+
+    // Giả lập CategorizationService tìm thấy category mặc định.
+    categorizationService.categorize = jest.fn(async () => ({
+      categoryId,
+      source: 'DEFAULT_KEYWORD',
+      matchedRuleId: null,
+    }));
+
+    // Giả lập ví tồn tại và thuộc user.
+    db.select.mockReturnValueOnce(
+      queryChain([
+        {
+          id: walletId,
+          isArchived: false,
+        },
+      ]),
+    );
+
+    // Giả lập lưu observation ở trạng thái PENDING.
+    db.insert.mockReturnValueOnce(insertChain([pendingObservation]));
+
+    // Giả lập transaction được PostgreSQL trả về sau khi insert.
+    const { txInsert } = mockSuccessfulTransaction({
+      categoryId,
+      categorizationSource: 'DEFAULT_KEYWORD',
+      matchedRuleId: null,
+    });
+
+    const result = await service.create(userId, validDto);
+
+    expect(result.duplicate).toBe(false);
+
+    if (!('transaction' in result)) {
+      throw new Error('Expected a parsed transaction result');
+    }
+
+    // Kiểm tra service phân loại đã được gọi đúng dữ liệu.
+    expect(categorizationService.categorize).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId,
+        direction: 'IN',
+        kind: 'NORMAL',
+        reviewStatus: 'CONFIRMED',
+      }),
+      expect.anything(),
+    );
+
+    // Kiểm tra dữ liệu gửi vào câu lệnh INSERT transaction.
+    expect(txInsert.values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        categoryId,
+        categorizationSource: 'DEFAULT_KEYWORD',
+        matchedRuleId: null,
+      }),
+    );
+
+    // Kiểm tra transaction trả về có kết quả phân loại.
+    expect(result.transaction.categoryId).toBe(categoryId);
+    expect(result.transaction.categorizationSource).toBe('DEFAULT_KEYWORD');
   });
 });

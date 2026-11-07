@@ -96,6 +96,8 @@ export class TransactionsService {
         transactionTime: new Date(dto.transactionTime),
         merchantName: dto.merchantName ?? null,
         referenceCode: dto.referenceCode ?? null,
+        categorizationSource: dto.categoryId ? 'MANUAL' : 'NONE',
+        matchedRuleId: null,
         note: dto.note ?? null,
         origin: 'MANUAL',
       })
@@ -200,6 +202,12 @@ export class TransactionsService {
           referenceCode: dto.referenceCode,
         }),
         ...(dto.note !== undefined && { note: dto.note }),
+        ...(dto.categoryId !== undefined && {
+          categorizationSource: dto.categoryId
+            ? ('MANUAL' as const)
+            : ('NONE' as const),
+          matchedRuleId: null,
+        }),
         updatedAt: new Date(),
       })
       .where(
