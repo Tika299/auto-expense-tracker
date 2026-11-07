@@ -15,6 +15,13 @@
       "when": 1793714597693,
       "tag": "0001_rule_engine_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794039528359,
+      "tag": "0002_busy_rictor",
+      "breakpoints": true
     }
   ]
 }

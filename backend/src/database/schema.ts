@@ -50,10 +50,11 @@ export const transactionKind = pgEnum('transaction_kind', [
   'INTERNAL_TRANSFER',
 ]);
 
-export const transactionReviewStatus = pgEnum(
-  'transaction_review_status',
-  ['CONFIRMED', 'PENDING_REVIEW'],
-);
+export const transactionReviewStatus = pgEnum('transaction_review_status', [
+  'CONFIRMED',
+  'PENDING_REVIEW',
+  'EXCLUDED',
+]);
 
 export const categorizationSource = pgEnum('categorization_source', [
   'MANUAL',
@@ -74,10 +75,10 @@ export const transactionLinkStatus = pgEnum('transaction_link_status', [
   'USER_REJECTED',
 ]);
 
-export const categorizationMatchField = pgEnum(
-  'categorization_match_field',
-  ['MERCHANT_NAME', 'COUNTERPARTY_ACCOUNT'],
-);
+export const categorizationMatchField = pgEnum('categorization_match_field', [
+  'MERCHANT_NAME',
+  'COUNTERPARTY_ACCOUNT',
+]);
 
 export const categorizationOperator = pgEnum('categorization_operator', [
   'EXACT',
@@ -320,9 +321,7 @@ export const transactionLinks = pgTable(
 
     linkType: transactionLinkType('link_type').notNull(),
 
-    status: transactionLinkStatus('status')
-      .default('PENDING_REVIEW')
-      .notNull(),
+    status: transactionLinkStatus('status').default('PENDING_REVIEW').notNull(),
 
     // Sử dụng thang điểm 0–100.
     confidence: integer('confidence').default(0).notNull(),
@@ -346,18 +345,11 @@ export const transactionLinks = pgTable(
       table.linkType,
     ),
 
-    index('transaction_links_user_status_idx').on(
-      table.userId,
-      table.status,
-    ),
+    index('transaction_links_user_status_idx').on(table.userId, table.status),
 
-    index('transaction_links_primary_idx').on(
-      table.primaryTransactionId,
-    ),
+    index('transaction_links_primary_idx').on(table.primaryTransactionId),
 
-    index('transaction_links_related_idx').on(
-      table.relatedTransactionId,
-    ),
+    index('transaction_links_related_idx').on(table.relatedTransactionId),
   ],
 );
 

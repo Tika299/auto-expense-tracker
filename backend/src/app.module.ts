@@ -11,6 +11,8 @@ import { CategoriesModule } from './categories/categories.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { ObservationsModule } from './observations/observations.module';
 import { ReportsModule } from './reports/reports.module';
+import { CategorizationRulesModule } from './categorization-rules/categorization-rules.module';
+import { PendingReviewsModule } from './pending-reviews/pending-reviews.module';
 
 const envSchema = z.object({
   NODE_ENV: z
@@ -36,8 +38,10 @@ const envSchema = z.object({
     TransactionsModule,
     ObservationsModule,
     ReportsModule,
+    CategorizationRulesModule,
+    PendingReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

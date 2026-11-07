@@ -23,6 +23,10 @@ export class QueryTransactionDto {
   direction?: 'IN' | 'OUT';
 
   @IsOptional()
+  @IsIn(['CONFIRMED', 'PENDING_REVIEW', 'EXCLUDED'])
+  reviewStatus?: 'CONFIRMED' | 'PENDING_REVIEW' | 'EXCLUDED';
+
+  @IsOptional()
   @IsISO8601({ strict: true })
   from?: string;
 

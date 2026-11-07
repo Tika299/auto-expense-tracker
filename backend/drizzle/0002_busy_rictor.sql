@@ -1,0 +1,1 @@
+ALTER TYPE "public"."transaction_review_status" ADD VALUE 'EXCLUDED';

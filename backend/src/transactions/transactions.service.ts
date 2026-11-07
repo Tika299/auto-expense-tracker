@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { and, desc, eq, gte, lte } from 'drizzle-orm';
+import { and, desc, eq, gte, lte, ne } from 'drizzle-orm';
 import { DATABASE, type Database } from '../database/database.module';
 import { categories, transactions, wallets } from '../database/schema';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
@@ -127,6 +127,16 @@ export class TransactionsService {
 
     if (query.to) {
       conditions.push(lte(transactions.transactionTime, new Date(query.to)));
+    }
+
+    if (query.reviewStatus) {
+      conditions.push(eq(transactions.reviewStatus, query.reviewStatus));
+    } else {
+      /*
+       * Mặc định không hiển thị transaction đã bị loại do trùng.
+       * Muốn xem lịch sử thì truyền reviewStatus=EXCLUDED.
+       */
+      conditions.push(ne(transactions.reviewStatus, 'EXCLUDED'));
     }
 
     return this.db
