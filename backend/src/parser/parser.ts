@@ -1,7 +1,6 @@
 import { ParseInput, ParsedTransaction, ParseError } from './types';
 import { normalizeText } from './normalize';
 import { vcbNotificationV1, vcbEmailV1 } from './rules/vietcombank';
-import { techcombankRuleV1 } from './rules/techcombank';
 import {
   mbbankCardV1,
   mbbankEmailV1,
@@ -13,7 +12,6 @@ import { momoReceiptV1, momoRuleV1 } from './rules/momo';
 const RULES = [
   vcbEmailV1,
   vcbNotificationV1,
-  techcombankRuleV1,
   mbbankEmailV1,
   mbbankNotificationV1,
   mbbankCardV1,

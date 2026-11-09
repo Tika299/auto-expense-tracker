@@ -1,5 +1,5 @@
 export type ParseInput = {
-  source: 'VIETCOMBANK' | 'TECHCOMBANK' | 'MBBANK' | 'MOMO';
+  source: 'VIETCOMBANK' | 'MBBANK' | 'MOMO';
   channel: 'ANDROID_NOTIFICATION' | 'EMAIL';
   rawText: string;
   observedAt: string; // ISO 8601, thời điểm hệ thống nhận thông báo
