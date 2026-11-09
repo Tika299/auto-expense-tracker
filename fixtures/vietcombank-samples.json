@@ -14,6 +14,7 @@
       "transaction_time": "2026-10-27T18:47:46+07:00",
       "reference_code": "Ecom.EW26102700000001",
       "merchant_name": "MOMO",
+      "counterparty_account": null,
       "parser_rule": "vcb-notification-v1"
     }
   },
@@ -32,6 +33,7 @@
       "transaction_time": "2026-10-24T17:32:23+07:00",
       "reference_code": "ATM_CWD.90000001.000001",
       "merchant_name": null,
+      "counterparty_account": null,
       "parser_rule": "vcb-notification-v1"
     }
   },
@@ -50,6 +52,7 @@
       "transaction_time": "2026-10-20T16:55:02+07:00",
       "reference_code": "ATM_QRCWD.90000002.000002",
       "merchant_name": null,
+      "counterparty_account": null,
       "parser_rule": "vcb-notification-v1"
     }
   },
@@ -68,6 +71,7 @@
       "transaction_time": "2026-10-14T12:47:59+07:00",
       "reference_code": "9000TPBVI0000001",
       "merchant_name": "NGUYEN VAN A",
+      "counterparty_account": null,
       "parser_rule": "vcb-notification-v1"
     }
   },
@@ -86,6 +90,7 @@
       "transaction_time": "2026-10-14T10:51:42+07:00",
       "reference_code": "MBVCB.90000000001.9000BFTV00000001",
       "merchant_name": "NGUYEN VAN B",
+      "counterparty_account": "9000000002",
       "parser_rule": "vcb-notification-v1"
     }
   },
@@ -104,6 +109,7 @@
       "transaction_time": "2026-10-11T10:35:48+07:00",
       "reference_code": "PARTNER.DIRECT_DEBITS_VCB.MSE.900000000001",
       "merchant_name": "MOMO",
+      "counterparty_account": null,
       "parser_rule": "vcb-notification-v1"
     }
   },
@@ -122,6 +128,7 @@
       "transaction_time": "2026-10-07T09:30:50+07:00",
       "reference_code": "9000IBT1K2AAAAAA",
       "merchant_name": "NGUYEN VAN C",
+      "counterparty_account": null,
       "parser_rule": "vcb-notification-v1"
     }
   },
@@ -140,6 +147,7 @@
       "transaction_time": "2026-09-24T15:03:53+07:00",
       "reference_code": "9000IBT1K2BBBBBB",
       "merchant_name": "NGUYEN VAN C",
+      "counterparty_account": null,
       "parser_rule": "vcb-notification-v1"
     }
   }

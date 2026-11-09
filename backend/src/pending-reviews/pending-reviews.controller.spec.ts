@@ -101,4 +101,32 @@ describe('PendingReviewsController', () => {
 
     expect(service.resolve).toHaveBeenCalledWith(userId, reviewId, dto);
   });
+
+  it('passes internal-transfer decision to service', async () => {
+    const dto = {
+      decision: 'CONFIRM_INTERNAL_TRANSFER' as const,
+      note: 'Chuyển tiền giữa hai ví',
+    };
+
+    const expected = {
+      decision: 'CONFIRM_INTERNAL_TRANSFER',
+      linkType: 'INTERNAL_TRANSFER',
+    };
+
+    service.resolve.mockResolvedValue(expected);
+
+    const result = await controller.resolve(
+      {
+        user: {
+          id: userId,
+        },
+      },
+      reviewId,
+      dto,
+    );
+
+    expect(result).toEqual(expected);
+
+    expect(service.resolve).toHaveBeenCalledWith(userId, reviewId, dto);
+  });
 });

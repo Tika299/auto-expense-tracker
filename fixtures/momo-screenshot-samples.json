@@ -14,6 +14,7 @@
       "transaction_time": "2026-10-30T09:59:00.236+07:00",
       "reference_code": null,
       "merchant_name": "NGUYEN VAN A",
+      "counterparty_account": null,
       "parser_rule": "momo-v1"
     }
   },
@@ -32,6 +33,7 @@
       "transaction_time": "2026-10-30T09:59:18.089+07:00",
       "reference_code": null,
       "merchant_name": "NGUYEN VAN A",
+      "counterparty_account": null,
       "parser_rule": "momo-v1"
     }
   },
@@ -50,6 +52,7 @@
       "transaction_time": "2026-10-30T09:59:34.683+07:00",
       "reference_code": null,
       "merchant_name": "NGUYEN VAN A",
+      "counterparty_account": null,
       "parser_rule": "momo-v1"
     }
   },
@@ -68,6 +71,7 @@
       "transaction_time": "2026-10-30T09:59:50.735+07:00",
       "reference_code": null,
       "merchant_name": "NGUYEN VAN A",
+      "counterparty_account": null,
       "parser_rule": "momo-v1"
     }
   },
@@ -86,6 +90,7 @@
       "transaction_time": "2026-10-30T10:38:00+07:00",
       "reference_code": "900000000001",
       "merchant_name": "QUÁN ĂN AN BÌNH",
+      "counterparty_account": null,
       "parser_rule": "momo-receipt-v1"
     }
   },
@@ -104,6 +109,7 @@
       "transaction_time": "2026-10-30T10:27:00+07:00",
       "reference_code": "900000000002",
       "merchant_name": "VINAPHONE",
+      "counterparty_account": null,
       "parser_rule": "momo-receipt-v1"
     }
   },
@@ -122,6 +128,7 @@
       "transaction_time": "2026-10-29T21:06:00+07:00",
       "reference_code": "900000000003",
       "merchant_name": "NGUYEN VAN C",
+      "counterparty_account": "900000000001",
       "parser_rule": "momo-receipt-v1"
     }
   },
@@ -140,6 +147,7 @@
       "transaction_time": "2026-10-30T19:53:00+07:00",
       "reference_code": "900000000004",
       "merchant_name": "NGUYEN VAN D",
+      "counterparty_account": "9000000002",
       "parser_rule": "momo-receipt-v1"
     }
   }

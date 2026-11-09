@@ -14,6 +14,7 @@ const primaryId = '55555555-5555-4555-8555-555555555555';
 const relatedId = '66666666-6666-4666-8666-666666666666';
 const observationId = '77777777-7777-4777-8777-777777777777';
 const categoryId = '88888888-8888-4888-8888-888888888888';
+const relatedWalletId = '99999999-9999-4999-8999-999999999999';
 
 type QueryTerminal = 'where' | 'orderBy' | 'limit' | 'offset' | 'for';
 
@@ -126,6 +127,22 @@ function makeObservation() {
   };
 }
 
+function makeInternalTransferLink() {
+  return {
+    ...makePendingLink(),
+
+    linkType: 'INTERNAL_TRANSFER',
+    confidence: 85,
+
+    metadata: {
+      reason: 'AMOUNT_TIME_OPPOSITE_DIRECTION',
+      timeDeltaMs: 30000,
+      referenceMatched: false,
+      accountMatched: false,
+    },
+  };
+}
+
 describe('PendingReviewsService', () => {
   let db: any;
   let service: PendingReviewsService;
@@ -231,6 +248,7 @@ describe('PendingReviewsService', () => {
     const relatedUpdate = updateChain();
     const observationUpdate = updateChain();
     const linkUpdate = updateChain([updatedLink], true);
+    const siblingLinksUpdate = updateChain();
 
     const tx = {
       select: jest
@@ -243,7 +261,8 @@ describe('PendingReviewsService', () => {
         .mockReturnValueOnce(primaryUpdate)
         .mockReturnValueOnce(relatedUpdate)
         .mockReturnValueOnce(observationUpdate)
-        .mockReturnValueOnce(linkUpdate),
+        .mockReturnValueOnce(linkUpdate)
+        .mockReturnValueOnce(siblingLinksUpdate),
     };
 
     db.transaction.mockImplementation(
@@ -315,13 +334,14 @@ describe('PendingReviewsService', () => {
         .fn()
         .mockReturnValueOnce(linkQuery)
         .mockReturnValueOnce(transactionsQuery)
+        .mockReturnValueOnce(queryChain([], 'limit'))
         .mockReturnValueOnce(observationQuery),
 
       update: jest
         .fn()
+        .mockReturnValueOnce(linkUpdate)
         .mockReturnValueOnce(relatedUpdate)
-        .mockReturnValueOnce(observationUpdate)
-        .mockReturnValueOnce(linkUpdate),
+        .mockReturnValueOnce(observationUpdate),
     };
 
     db.transaction.mockImplementation(
@@ -395,7 +415,7 @@ describe('PendingReviewsService', () => {
     expect(tx.update).not.toHaveBeenCalled();
   });
 
-  it('rejects an unsupported link type', async () => {
+  it('rejects a duplicate decision for an internal-transfer link', async () => {
     const internalTransferLink = {
       ...makePendingLink(),
       linkType: 'INTERNAL_TRANSFER',
@@ -417,5 +437,179 @@ describe('PendingReviewsService', () => {
     ).rejects.toBeInstanceOf(BadRequestException);
 
     expect(tx.update).not.toHaveBeenCalled();
+  });
+
+  it('CONFIRM_INTERNAL_TRANSFER marks both transactions as internal', async () => {
+    const link = makeInternalTransferLink();
+
+    const primary = {
+      ...makePrimaryTransaction(),
+      direction: 'OUT',
+    };
+
+    const related = {
+      ...makeRelatedTransaction(),
+
+      walletId: relatedWalletId,
+      direction: 'IN',
+    };
+
+    const updatedLink = {
+      ...link,
+      status: 'USER_CONFIRMED',
+      resolvedAt: new Date(),
+    };
+
+    const linkQuery = queryChain([link], 'for');
+
+    const transactionsQuery = queryChain([primary, related], 'where');
+
+    const transactionsUpdate = updateChain();
+    const observationUpdate = updateChain();
+    const linkUpdate = updateChain([updatedLink], true);
+    const siblingLinksUpdate = updateChain();
+
+    const tx = {
+      select: jest
+        .fn()
+        .mockReturnValueOnce(linkQuery)
+        .mockReturnValueOnce(transactionsQuery),
+
+      update: jest
+        .fn()
+        .mockReturnValueOnce(transactionsUpdate)
+        .mockReturnValueOnce(observationUpdate)
+        .mockReturnValueOnce(linkUpdate)
+        .mockReturnValueOnce(siblingLinksUpdate),
+    };
+
+    db.transaction.mockImplementation(
+      async (callback: (value: any) => unknown) => callback(tx),
+    );
+
+    const result = await service.resolve(userId, reviewId, {
+      decision: 'CONFIRM_INTERNAL_TRANSFER',
+      note: 'Chuyển tiền giữa hai ví của tôi',
+    });
+
+    expect(result.decision).toBe('CONFIRM_INTERNAL_TRANSFER');
+
+    expect(result.linkType).toBe('INTERNAL_TRANSFER');
+
+    expect(transactionsUpdate.set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'INTERNAL_TRANSFER',
+        reviewStatus: 'CONFIRMED',
+
+        categoryId: null,
+        categorizationSource: 'NONE',
+        matchedRuleId: null,
+      }),
+    );
+
+    expect(observationUpdate.set).toHaveBeenCalledWith({
+      status: 'PARSED',
+    });
+
+    expect(linkUpdate.set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'USER_CONFIRMED',
+
+        metadata: expect.objectContaining({
+          decision: 'CONFIRM_INTERNAL_TRANSFER',
+          resolutionNote: 'Chuyển tiền giữa hai ví của tôi',
+        }),
+      }),
+    );
+
+    expect(categorizationService.categorize).not.toHaveBeenCalled();
+  });
+
+  it('KEEP_SEPARATE confirms and categorizes the related transaction', async () => {
+    const link = makeInternalTransferLink();
+
+    const primary = {
+      ...makePrimaryTransaction(),
+      direction: 'OUT',
+    };
+
+    const related = {
+      ...makeRelatedTransaction(),
+
+      walletId: relatedWalletId,
+      direction: 'IN',
+    };
+
+    const observation = makeObservation();
+
+    const updatedLink = {
+      ...link,
+      status: 'USER_REJECTED',
+      resolvedAt: new Date(),
+    };
+
+    const linkQuery = queryChain([link], 'for');
+
+    const transactionsQuery = queryChain([primary, related], 'where');
+
+    const remainingLinksQuery = queryChain([], 'limit');
+
+    const observationQuery = queryChain([observation], 'limit');
+
+    const linkUpdate = updateChain([updatedLink], true);
+    const relatedUpdate = updateChain();
+    const observationUpdate = updateChain();
+
+    const tx = {
+      select: jest
+        .fn()
+        .mockReturnValueOnce(linkQuery)
+        .mockReturnValueOnce(transactionsQuery)
+        .mockReturnValueOnce(remainingLinksQuery)
+        .mockReturnValueOnce(observationQuery),
+
+      update: jest
+        .fn()
+        .mockReturnValueOnce(linkUpdate)
+        .mockReturnValueOnce(relatedUpdate)
+        .mockReturnValueOnce(observationUpdate),
+    };
+
+    db.transaction.mockImplementation(
+      async (callback: (value: any) => unknown) => callback(tx),
+    );
+
+    const result = await service.resolve(userId, reviewId, {
+      decision: 'KEEP_SEPARATE',
+      note: 'Đây là hai giao dịch độc lập',
+    });
+
+    expect(result.decision).toBe('KEEP_SEPARATE');
+    expect(result.relatedStillPending).toBe(false);
+
+    expect(categorizationService.categorize).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId,
+        direction: 'IN',
+        kind: 'NORMAL',
+        reviewStatus: 'CONFIRMED',
+      }),
+      tx,
+    );
+
+    expect(relatedUpdate.set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'NORMAL',
+        reviewStatus: 'CONFIRMED',
+
+        categoryId,
+        categorizationSource: 'DEFAULT_KEYWORD',
+        matchedRuleId: null,
+      }),
+    );
+
+    expect(observationUpdate.set).toHaveBeenCalledWith({
+      status: 'PARSED',
+    });
   });
 });

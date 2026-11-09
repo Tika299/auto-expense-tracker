@@ -43,23 +43,27 @@ export class PendingReviewsService {
         primaryTransaction: {
           id: primaryTransaction.id,
           walletId: primaryTransaction.walletId,
+          categoryId: primaryTransaction.categoryId,
           amount: primaryTransaction.amount,
           direction: primaryTransaction.direction,
           transactionTime: primaryTransaction.transactionTime,
           referenceCode: primaryTransaction.referenceCode,
           merchantName: primaryTransaction.merchantName,
           reviewStatus: primaryTransaction.reviewStatus,
+          kind: primaryTransaction.kind,
         },
 
         relatedTransaction: {
           id: relatedTransaction.id,
           walletId: relatedTransaction.walletId,
+          categoryId: relatedTransaction.categoryId,
           amount: relatedTransaction.amount,
           direction: relatedTransaction.direction,
           transactionTime: relatedTransaction.transactionTime,
           referenceCode: relatedTransaction.referenceCode,
           merchantName: relatedTransaction.merchantName,
           reviewStatus: relatedTransaction.reviewStatus,
+          kind: relatedTransaction.kind,
         },
       })
       .from(transactionLinks)
@@ -75,7 +79,10 @@ export class PendingReviewsService {
         and(
           eq(transactionLinks.userId, userId),
           eq(transactionLinks.status, 'PENDING_REVIEW'),
-          eq(transactionLinks.linkType, 'POSSIBLE_DUPLICATE'),
+
+          query.linkType
+            ? eq(transactionLinks.linkType, query.linkType)
+            : undefined,
         ),
       )
       .orderBy(desc(transactionLinks.createdAt))
@@ -167,6 +174,187 @@ export class PendingReviewsService {
     };
   }
 
+  private validateDecision(
+    linkType: 'POSSIBLE_DUPLICATE' | 'INTERNAL_TRANSFER',
+    decision: ResolvePendingReviewDto['decision'],
+  ) {
+    if (linkType === 'POSSIBLE_DUPLICATE') {
+      if (decision !== 'CONFIRM_DUPLICATE' && decision !== 'KEEP_BOTH') {
+        throw new BadRequestException(
+          'POSSIBLE_DUPLICATE chỉ hỗ trợ CONFIRM_DUPLICATE hoặc KEEP_BOTH.',
+        );
+      }
+
+      return;
+    }
+
+    if (
+      decision !== 'CONFIRM_INTERNAL_TRANSFER' &&
+      decision !== 'KEEP_SEPARATE'
+    ) {
+      throw new BadRequestException(
+        'INTERNAL_TRANSFER chỉ hỗ trợ CONFIRM_INTERNAL_TRANSFER hoặc KEEP_SEPARATE.',
+      );
+    }
+  }
+
+  private async resolveLink(
+    tx: Database,
+    userId: string,
+    link: typeof transactionLinks.$inferSelect,
+    dto: ResolvePendingReviewDto,
+    status: 'USER_CONFIRMED' | 'USER_REJECTED',
+    resolvedAt: Date,
+  ) {
+    const [updatedLink] = await tx
+      .update(transactionLinks)
+      .set({
+        status,
+        resolvedAt,
+
+        metadata: {
+          ...link.metadata,
+          decision: dto.decision,
+          resolutionNote: dto.note ?? null,
+        },
+      })
+      .where(
+        and(
+          eq(transactionLinks.id, link.id),
+          eq(transactionLinks.userId, userId),
+          eq(transactionLinks.status, 'PENDING_REVIEW'),
+        ),
+      )
+      .returning();
+
+    if (!updatedLink) {
+      throw new ConflictException(
+        'Yêu cầu đối soát đã được xử lý bởi request khác.',
+      );
+    }
+
+    return updatedLink;
+  }
+
+  private async rejectOtherPendingLinks(
+    tx: Database,
+    userId: string,
+    relatedTransactionId: string,
+    resolvedAt: Date,
+  ) {
+    await tx
+      .update(transactionLinks)
+      .set({
+        status: 'USER_REJECTED',
+        resolvedAt,
+      })
+      .where(
+        and(
+          eq(transactionLinks.userId, userId),
+
+          eq(transactionLinks.relatedTransactionId, relatedTransactionId),
+
+          eq(transactionLinks.status, 'PENDING_REVIEW'),
+        ),
+      );
+  }
+
+  private async hasRemainingPendingLinks(
+    tx: Database,
+    userId: string,
+    relatedTransactionId: string,
+  ) {
+    const [remainingLink] = await tx
+      .select({
+        id: transactionLinks.id,
+      })
+      .from(transactionLinks)
+      .where(
+        and(
+          eq(transactionLinks.userId, userId),
+
+          eq(transactionLinks.relatedTransactionId, relatedTransactionId),
+
+          eq(transactionLinks.status, 'PENDING_REVIEW'),
+        ),
+      )
+      .limit(1);
+
+    return Boolean(remainingLink);
+  }
+
+  private async confirmInternalTransfer(
+    tx: Database,
+    userId: string,
+    primary: typeof transactions.$inferSelect,
+    related: typeof transactions.$inferSelect,
+  ) {
+    /*
+     * Kiểm tra lại tính hợp lệ tại thời điểm xử lý.
+     */
+    if (primary.amount !== related.amount) {
+      throw new BadRequestException('Hai giao dịch không cùng số tiền.');
+    }
+
+    if (primary.direction === related.direction) {
+      throw new BadRequestException(
+        'Chuyển tiền nội bộ phải gồm một chiều IN và một chiều OUT.',
+      );
+    }
+
+    if (primary.walletId === related.walletId) {
+      throw new BadRequestException(
+        'Chuyển tiền nội bộ phải xảy ra giữa hai ví khác nhau.',
+      );
+    }
+
+    const updatedAt = new Date();
+
+    /*
+     * Cả hai chiều đều là INTERNAL_TRANSFER.
+     * Xóa category vì không phải thu nhập hoặc chi tiêu.
+     */
+    await tx
+      .update(transactions)
+      .set({
+        kind: 'INTERNAL_TRANSFER',
+        reviewStatus: 'CONFIRMED',
+
+        categoryId: null,
+        categorizationSource: 'NONE',
+        matchedRuleId: null,
+
+        updatedAt,
+      })
+      .where(
+        and(
+          eq(transactions.userId, userId),
+          inArray(transactions.id, [primary.id, related.id]),
+        ),
+      );
+
+    /*
+     * Observation của giao dịch mới không còn chờ review.
+     */
+    await tx
+      .update(transactionObservations)
+      .set({
+        status: 'PARSED',
+      })
+      .where(
+        and(
+          eq(transactionObservations.userId, userId),
+
+          inArray(transactionObservations.transactionId, [
+            primary.id,
+            related.id,
+          ]),
+
+          eq(transactionObservations.status, 'PENDING_REVIEW'),
+        ),
+      );
+  }
+
   async resolve(
     userId: string,
     reviewId: string,
@@ -174,8 +362,8 @@ export class PendingReviewsService {
   ) {
     return this.db.transaction(async (tx) => {
       /*
-       * FOR UPDATE ngăn hai request cùng lúc xử lý
-       * một review hai lần.
+       * Khóa review để ngăn cùng một review
+       * bị xử lý hai lần đồng thời.
        */
       const [link] = await tx
         .select()
@@ -197,11 +385,7 @@ export class PendingReviewsService {
         throw new ConflictException('Yêu cầu đối soát này đã được xử lý.');
       }
 
-      if (link.linkType !== 'POSSIBLE_DUPLICATE') {
-        throw new BadRequestException(
-          'Loại đối soát này chưa được API hỗ trợ.',
-        );
-      }
+      this.validateDecision(link.linkType, dto.decision);
 
       const transactionRows = await tx
         .select()
@@ -209,6 +393,7 @@ export class PendingReviewsService {
         .where(
           and(
             eq(transactions.userId, userId),
+
             inArray(transactions.id, [
               link.primaryTransactionId,
               link.relatedTransactionId,
@@ -232,53 +417,133 @@ export class PendingReviewsService {
 
       const resolvedAt = new Date();
 
-      if (dto.decision === 'CONFIRM_DUPLICATE') {
-        await this.confirmDuplicate(
-          tx as unknown as Database,
-          userId,
-          primary.id,
-          related.id,
-        );
+      let updatedLink: typeof transactionLinks.$inferSelect;
+
+      let relatedStillPending = false;
+
+      if (link.linkType === 'POSSIBLE_DUPLICATE') {
+        if (dto.decision === 'CONFIRM_DUPLICATE') {
+          await this.confirmDuplicate(
+            tx as unknown as Database,
+            userId,
+            primary.id,
+            related.id,
+          );
+
+          updatedLink = await this.resolveLink(
+            tx as unknown as Database,
+            userId,
+            link,
+            dto,
+            'USER_CONFIRMED',
+            resolvedAt,
+          );
+
+          /*
+           * Transaction related đã được xác định là trùng.
+           * Những ứng viên khác không còn giá trị.
+           */
+          await this.rejectOtherPendingLinks(
+            tx as unknown as Database,
+            userId,
+            related.id,
+            resolvedAt,
+          );
+        } else {
+          /*
+           * Chỉ từ chối link đang chọn trước.
+           */
+          updatedLink = await this.resolveLink(
+            tx as unknown as Database,
+            userId,
+            link,
+            dto,
+            'USER_REJECTED',
+            resolvedAt,
+          );
+
+          relatedStillPending = await this.hasRemainingPendingLinks(
+            tx as unknown as Database,
+            userId,
+            related.id,
+          );
+
+          /*
+           * Chỉ xác nhận transaction bình thường nếu
+           * không còn ứng viên nào khác.
+           */
+          if (!relatedStillPending) {
+            await this.confirmAsSeparateTransaction(
+              tx as unknown as Database,
+              userId,
+              related,
+            );
+          }
+        }
       } else {
-        await this.keepBoth(tx as unknown as Database, userId, related);
-      }
+        if (dto.decision === 'CONFIRM_INTERNAL_TRANSFER') {
+          await this.confirmInternalTransfer(
+            tx as unknown as Database,
+            userId,
+            primary,
+            related,
+          );
 
-      const resolvedStatus =
-        dto.decision === 'CONFIRM_DUPLICATE'
-          ? ('USER_CONFIRMED' as const)
-          : ('USER_REJECTED' as const);
+          updatedLink = await this.resolveLink(
+            tx as unknown as Database,
+            userId,
+            link,
+            dto,
+            'USER_CONFIRMED',
+            resolvedAt,
+          );
 
-      const [updatedLink] = await tx
-        .update(transactionLinks)
-        .set({
-          status: resolvedStatus,
-          resolvedAt,
-          metadata: {
-            ...link.metadata,
-            decision: dto.decision,
-            resolutionNote: dto.note ?? null,
-          },
-        })
-        .where(
-          and(
-            eq(transactionLinks.id, reviewId),
-            eq(transactionLinks.userId, userId),
-            eq(transactionLinks.status, 'PENDING_REVIEW'),
-          ),
-        )
-        .returning();
+          /*
+           * Người dùng đã chọn đúng transaction đối ứng.
+           * Các ứng viên khác được tự động từ chối.
+           */
+          await this.rejectOtherPendingLinks(
+            tx as unknown as Database,
+            userId,
+            related.id,
+            resolvedAt,
+          );
+        } else {
+          updatedLink = await this.resolveLink(
+            tx as unknown as Database,
+            userId,
+            link,
+            dto,
+            'USER_REJECTED',
+            resolvedAt,
+          );
 
-      if (!updatedLink) {
-        throw new ConflictException(
-          'Yêu cầu đối soát đã được xử lý bởi request khác.',
-        );
+          relatedStillPending = await this.hasRemainingPendingLinks(
+            tx as unknown as Database,
+            userId,
+            related.id,
+          );
+
+          if (!relatedStillPending) {
+            await this.confirmAsSeparateTransaction(
+              tx as unknown as Database,
+              userId,
+              related,
+            );
+          }
+        }
       }
 
       return {
         review: updatedLink,
+
+        linkType: link.linkType,
         decision: dto.decision,
+
         primaryTransactionId: primary.id,
         relatedTransactionId: related.id,
+
+        relatedStillPending,
       };
     });
   }
@@ -343,7 +608,7 @@ export class PendingReviewsService {
       );
   }
 
-  private async keepBoth(
+  private async confirmAsSeparateTransaction(
     tx: Database,
     userId: string,
     related: typeof transactions.$inferSelect,
@@ -383,6 +648,7 @@ export class PendingReviewsService {
     await tx
       .update(transactions)
       .set({
+        kind: 'NORMAL',
         reviewStatus: 'CONFIRMED',
         categoryId: categorization.categoryId,
         categorizationSource: categorization.source,

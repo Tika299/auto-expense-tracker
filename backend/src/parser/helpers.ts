@@ -20,6 +20,19 @@ export function parseVnd(value: string): number {
   return amount;
 }
 
+export function cleanAccount(value: string | null | undefined): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value
+    .normalize('NFKC')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
+
+  return normalized.length >= 6 ? normalized : null;
+}
+
 export function toIso8601(dateParts: {
   year: string;
   month: string;

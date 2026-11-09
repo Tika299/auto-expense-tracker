@@ -1,7 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsIn, IsInt, IsOptional, Max, Min } from 'class-validator';
 
 export class QueryPendingReviewDto {
+  @IsOptional()
+  @IsIn(['POSSIBLE_DUPLICATE', 'INTERNAL_TRANSFER'])
+  linkType?: 'POSSIBLE_DUPLICATE' | 'INTERNAL_TRANSFER';
+
   @IsOptional()
   @Type(() => Number)
   @IsInt()

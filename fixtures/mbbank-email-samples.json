@@ -14,6 +14,7 @@
       "transaction_time": "2026-10-22T19:22:14+07:00",
       "reference_code": "90000000000000001",
       "merchant_name": "MOMO",
+      "counterparty_account": "99MM23XXXXXXXX0001",
       "parser_rule": "mbbank-email-v1"
     }
   },
@@ -32,6 +33,7 @@
       "transaction_time": "2026-10-20T12:20:50+07:00",
       "reference_code": "90000000000000002",
       "merchant_name": "MOMO",
+      "counterparty_account": "99MM23XXXXXXXX0001",
       "parser_rule": "mbbank-email-v1"
     }
   },
@@ -50,6 +52,7 @@
       "transaction_time": "2026-10-16T13:59:03+07:00",
       "reference_code": "90000000000000003",
       "merchant_name": "NGUYEN VAN C",
+      "counterparty_account": "900000XXX0002",
       "parser_rule": "mbbank-email-v1"
     }
   },
@@ -68,6 +71,7 @@
       "transaction_time": "2026-10-15T07:01:01+07:00",
       "reference_code": "90000000000000004",
       "merchant_name": "MOMO",
+      "counterparty_account": "99MM23XXXXXXXX0001",
       "parser_rule": "mbbank-email-v1"
     }
   }

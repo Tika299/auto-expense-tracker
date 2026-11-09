@@ -6,12 +6,13 @@ export type ParseInput = {
 };
 
 export type ParsedTransaction = {
-  amount: number; // số nguyên dương, luôn dương
+  amount: number;
   direction: 'IN' | 'OUT';
-  transaction_time: string; // chuẩn ISO 8601 kèm múi giờ +07:00
+  transaction_time: string;
   reference_code: string | null;
   merchant_name: string | null;
-  parser_rule: string; // định danh Regex/Rule đã sử dụng
+  counterparty_account: string | null;
+  parser_rule: string;
 };
 
 export type ParserRule = {

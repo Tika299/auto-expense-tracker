@@ -21,6 +21,8 @@ import { CreateObservationDto } from './dto/create-observation.dto';
 import { DeduplicationService } from '../rule-engine/deduplication.service';
 import type { TransactionDeduplicationDecision } from '../rule-engine/deduplication.types';
 import { CategorizationService } from '../rule-engine/categorization.service';
+import { ReconciliationService } from '../rule-engine/reconciliation.service';
+import type { ReconciliationDecision } from '../rule-engine/reconciliation.types';
 
 type ObservationRecord = typeof transactionObservations.$inferSelect;
 
@@ -31,6 +33,8 @@ export class ObservationsService {
     private readonly db: Database,
 
     private readonly deduplicationService: DeduplicationService,
+
+    private readonly reconciliationService: ReconciliationService,
 
     private readonly categorizationService: CategorizationService,
   ) {}
@@ -121,26 +125,89 @@ export class ObservationsService {
       throw new BadRequestException('Observation chưa được gắn với ví.');
     }
 
-    const pendingReview = decision.kind === 'PENDING_REVIEW';
-
     return this.db.transaction(async (tx) => {
+      /*
+       * Chỉ chạy Reconciliation khi Deduplication đã chắc chắn
+       * đây không phải giao dịch trùng.
+       *
+       * Nếu Deduplication đang PENDING_REVIEW thì ưu tiên
+       * xử lý nghi vấn trùng trước.
+       */
+      let reconciliation: ReconciliationDecision = {
+        kind: 'NO_MATCH',
+      };
+
+      if (decision.kind === 'NO_DUPLICATE') {
+        reconciliation = await this.reconciliationService.evaluate(
+          {
+            userId,
+            walletId: observation.walletId!,
+
+            source: observation.source,
+            channel: observation.channel,
+
+            amount: parsed.amount,
+            direction: parsed.direction,
+            transactionTime,
+
+            referenceCode: parsed.reference_code,
+
+            counterpartyAccount: parsed.counterparty_account,
+          },
+          tx,
+        );
+      }
+
+      const duplicatePendingReview = decision.kind === 'PENDING_REVIEW';
+
+      const internalTransferPendingReview =
+        reconciliation.kind === 'PENDING_REVIEW';
+
+      const autoConfirmedInternalTransfer =
+        reconciliation.kind === 'AUTO_CONFIRMED';
+
+      const pendingReview =
+        duplicatePendingReview || internalTransferPendingReview;
+
+      /*
+       * Chỉ gán INTERNAL_TRANSFER khi đã đủ bằng chứng
+       * để tự động xác nhận.
+       *
+       * Giao dịch đang PENDING_REVIEW vẫn giữ kind NORMAL
+       * cho đến khi người dùng xác nhận.
+       */
+      const newTransactionKind = autoConfirmedInternalTransfer
+        ? ('INTERNAL_TRANSFER' as const)
+        : ('NORMAL' as const);
+
+      const newTransactionReviewStatus = pendingReview
+        ? ('PENDING_REVIEW' as const)
+        : ('CONFIRMED' as const);
+
+      /*
+       * CategorizationService tự trả NONE nếu:
+       * - kind là INTERNAL_TRANSFER; hoặc
+       * - reviewStatus là PENDING_REVIEW.
+       */
       const categorization = await this.categorizationService.categorize(
         {
           userId,
           direction: parsed.direction,
-          kind: 'NORMAL',
-          reviewStatus: pendingReview ? 'PENDING_REVIEW' : 'CONFIRMED',
+          kind: newTransactionKind,
+          reviewStatus: newTransactionReviewStatus,
           merchantName: parsed.merchant_name,
-          counterpartyAccount: null,
+          counterpartyAccount: parsed.counterparty_account,
           rawText: observation.rawText,
         },
         tx,
       );
+
       const [createdTransaction] = await tx
         .insert(transactions)
         .values({
           userId,
           walletId: observation.walletId!,
+
           categoryId: categorization.categoryId,
 
           amount: parsed.amount,
@@ -149,12 +216,10 @@ export class ObservationsService {
 
           referenceCode: parsed.reference_code,
           merchantName: parsed.merchant_name,
+          counterpartyAccount: parsed.counterparty_account,
 
-          // Parser hiện chưa trả trường này.
-          counterpartyAccount: null,
-
-          kind: 'NORMAL',
-          reviewStatus: pendingReview ? 'PENDING_REVIEW' : 'CONFIRMED',
+          kind: newTransactionKind,
+          reviewStatus: newTransactionReviewStatus,
 
           categorizationSource: categorization.source,
           matchedRuleId: categorization.matchedRuleId,
@@ -170,6 +235,9 @@ export class ObservationsService {
 
       let createdLinks: Array<typeof transactionLinks.$inferSelect> = [];
 
+      /*
+       * Trường hợp Deduplication nghi ngờ đây là giao dịch trùng.
+       */
       if (
         decision.kind === 'PENDING_REVIEW' &&
         decision.candidates.length > 0
@@ -180,10 +248,7 @@ export class ObservationsService {
             decision.candidates.map((candidate) => ({
               userId,
 
-              // Transaction cũ là primary.
               primaryTransactionId: candidate.transactionId,
-
-              // Transaction vừa tạo là related.
               relatedTransactionId: createdTransaction.id,
 
               linkType: 'POSSIBLE_DUPLICATE' as const,
@@ -200,6 +265,132 @@ export class ObservationsService {
           )
           .onConflictDoNothing()
           .returning();
+
+        if (createdLinks.length !== decision.candidates.length) {
+          throw new Error(
+            'Không thể tạo đầy đủ liên kết giao dịch nghi trùng.',
+          );
+        }
+      } else if (reconciliation.kind === 'AUTO_CONFIRMED') {
+        /*
+         * Giao dịch cũ và giao dịch mới là hai chiều
+         * của một lần chuyển tiền nội bộ.
+         */
+        const candidate = reconciliation.candidate;
+        const resolvedAt = new Date();
+
+        const [updatedCandidate] = await tx
+          .update(transactions)
+          .set({
+            kind: 'INTERNAL_TRANSFER',
+
+            /*
+             * INTERNAL_TRANSFER không thuộc danh mục thu hoặc chi.
+             */
+            categoryId: null,
+            categorizationSource: 'NONE',
+            matchedRuleId: null,
+
+            updatedAt: resolvedAt,
+          })
+          .where(
+            and(
+              eq(transactions.id, candidate.transactionId),
+              eq(transactions.userId, userId),
+              eq(transactions.kind, 'NORMAL'),
+              eq(transactions.reviewStatus, 'CONFIRMED'),
+            ),
+          )
+          .returning();
+
+        /*
+         * Nếu không update được, candidate có thể vừa bị
+         * request khác xử lý. Throw sẽ rollback transaction mới.
+         */
+        if (!updatedCandidate) {
+          throw new Error(
+            'Giao dịch đối ứng vừa thay đổi, không thể tự động đối soát.',
+          );
+        }
+
+        createdLinks = await tx
+          .insert(transactionLinks)
+          .values({
+            userId,
+
+            primaryTransactionId: candidate.transactionId,
+            relatedTransactionId: createdTransaction.id,
+
+            linkType: 'INTERNAL_TRANSFER',
+            status: 'AUTO_CONFIRMED',
+            confidence: candidate.confidence,
+
+            metadata: {
+              reason: reconciliation.reason,
+              timeDeltaMs: candidate.timeDeltaMs,
+
+              referenceMatched: candidate.referenceMatched,
+              accountMatched: candidate.accountMatched,
+
+              candidateSource: candidate.source,
+              candidateChannel: candidate.channel,
+
+              incomingSource: observation.source,
+              incomingChannel: observation.channel,
+            },
+
+            resolvedAt,
+          })
+          .onConflictDoNothing()
+          .returning();
+
+        if (createdLinks.length !== 1) {
+          throw new Error('Không thể tạo liên kết chuyển tiền nội bộ.');
+        }
+      } else if (
+        reconciliation.kind === 'PENDING_REVIEW' &&
+        reconciliation.candidates.length > 0
+      ) {
+        /*
+         * Chưa đủ bằng chứng tự động xác nhận.
+         *
+         * Transaction mới được đặt PENDING_REVIEW.
+         * Các candidate cũ tạm thời chưa bị thay đổi.
+         */
+        createdLinks = await tx
+          .insert(transactionLinks)
+          .values(
+            reconciliation.candidates.map((candidate) => ({
+              userId,
+
+              primaryTransactionId: candidate.transactionId,
+              relatedTransactionId: createdTransaction.id,
+
+              linkType: 'INTERNAL_TRANSFER' as const,
+              status: 'PENDING_REVIEW' as const,
+              confidence: candidate.confidence,
+
+              metadata: {
+                reason: reconciliation.reason,
+                timeDeltaMs: candidate.timeDeltaMs,
+
+                referenceMatched: candidate.referenceMatched,
+                accountMatched: candidate.accountMatched,
+
+                candidateSource: candidate.source,
+                candidateChannel: candidate.channel,
+
+                incomingSource: observation.source,
+                incomingChannel: observation.channel,
+              },
+            })),
+          )
+          .onConflictDoNothing()
+          .returning();
+
+        if (createdLinks.length !== reconciliation.candidates.length) {
+          throw new Error('Không thể tạo đầy đủ liên kết đối soát nội bộ.');
+        }
       }
 
       const [updatedObservation] = await tx
@@ -227,10 +418,13 @@ export class ObservationsService {
       return {
         duplicate: false as const,
         pendingReview,
+
         observation: updatedObservation,
         transaction: createdTransaction,
         links: createdLinks,
+
         deduplication: decision,
+        reconciliation,
       };
     });
   }
@@ -305,8 +499,7 @@ export class ObservationsService {
       referenceCode: parsed.reference_code,
       merchantName: parsed.merchant_name,
 
-      // Parser hiện chưa bóc tách STK đối tác.
-      counterpartyAccount: null,
+      counterpartyAccount: parsed.counterparty_account,
     });
 
     if (decision.kind === 'EXACT_DUPLICATE' || decision.kind === 'AUTO_MERGE') {

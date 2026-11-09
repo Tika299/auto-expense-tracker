@@ -1,4 +1,4 @@
-import { parseVnd, toIso8601 } from '../helpers';
+import { cleanAccount, parseVnd, toIso8601 } from '../helpers';
 import {
   ParseError,
   ParseInput,
@@ -21,6 +21,7 @@ function parseMbDetails(
 ): {
   reference_code: string | null;
   merchant_name: string | null;
+  counterparty_account: string | null;
 } {
   if (den) {
     const parts = den.split(' - ');
@@ -28,9 +29,14 @@ function parseMbDetails(
       return {
         merchant_name: parts[0].trim(),
         reference_code: parts.slice(1).join(' - ').trim(),
+        counterparty_account: null,
       };
     }
-    return { merchant_name: den.trim(), reference_code: null };
+    return {
+      merchant_name: den.trim(),
+      reference_code: null,
+      counterparty_account: null,
+    };
   }
 
   if (nd) {
@@ -41,6 +47,7 @@ function parseMbDetails(
       return {
         reference_code: ghtk.groups.ref,
         merchant_name: 'GIAOHANGTIETKIEM',
+        counterparty_account: null,
       };
     }
 
@@ -51,11 +58,16 @@ function parseMbDetails(
       return {
         reference_code: momo.groups.ref,
         merchant_name: momo.groups.merchant.toUpperCase(),
+        counterparty_account: null,
       };
     }
   }
 
-  return { reference_code: null, merchant_name: null };
+  return {
+    reference_code: null,
+    merchant_name: null,
+    counterparty_account: null,
+  };
 }
 
 export const mbbankNotificationV1: ParserRule = {
@@ -110,6 +122,7 @@ export const mbbankCardV1: ParserRule = {
       transaction_time: toIso8601({ year, month, day, hour, minute, second }),
       reference_code: null,
       merchant_name: merchant.trim(),
+      counterparty_account: null,
       parser_rule: 'mbbank-card-v1',
     };
   },
@@ -128,7 +141,14 @@ export const mbbankEmailV1: ParserRule = {
 
     const { day, month, year, hour, minute, second, ref, beneficiary, amount } =
       match.groups;
-    const rawMerchant = beneficiary.split(/\s+-\s+/u)[0].trim();
+    const beneficiaryParts = beneficiary
+      .split(/\s+-\s+/u)
+      .map((value) => value.trim());
+    const rawMerchant = beneficiaryParts[0];
+    const counterpartyAccount =
+      beneficiaryParts.length >= 2
+        ? cleanAccount(beneficiaryParts.at(-1))
+        : null;
 
     return {
       amount: parseVnd(amount),
@@ -136,6 +156,7 @@ export const mbbankEmailV1: ParserRule = {
       transaction_time: toIso8601({ year, month, day, hour, minute, second }),
       reference_code: ref.trim(),
       merchant_name: rawMerchant.startsWith('MOMO_') ? 'MOMO' : rawMerchant,
+      counterparty_account: counterpartyAccount,
       parser_rule: 'mbbank-email-v1',
     };
   },

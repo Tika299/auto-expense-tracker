@@ -39,6 +39,7 @@ function parseTechcombank(text: string, observedAt: string): ParsedTransaction {
     transaction_time: parseTransactionTime(text, observedAt),
     reference_code: firstValue(text, REFERENCE_PATTERNS),
     merchant_name: firstValue(text, MERCHANT_PATTERNS),
+    counterparty_account: null,
     parser_rule: 'techcombank-v1',
   };
 }

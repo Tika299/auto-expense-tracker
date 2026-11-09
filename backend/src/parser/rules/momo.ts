@@ -1,4 +1,5 @@
 import {
+  cleanAccount,
   cleanCapturedValue,
   directionFromSign,
   parseTransactionTime,
@@ -53,6 +54,13 @@ const IN_MERCHANT_PATTERNS = [
   /(?:người\s*gửi)\s*:\s*(?<value>.+?)(?=\n|\.|;|$)/iu,
 ];
 
+const RECEIPT_COUNTERPARTY_ACCOUNT =
+  /(?:^|\n)Số thẻ\/TK\s*(?:\n|:\s*)?(?<value>[A-Z0-9]+)(?:\n|$)/iu;
+
+const COUNTERPARTY_ACCOUNT_PATTERNS = [
+  /(?:số tài khoản|tài khoản)\s*[:#-]?\s*(?<value>[A-Z0-9]{6,})/iu,
+];
+
 function firstValue(text: string, patterns: RegExp[]): string | null {
   for (const pattern of patterns) {
     const value = cleanCapturedValue(text.match(pattern)?.groups?.value);
@@ -80,6 +88,8 @@ function receiptMerchant(header: string): string | null {
 function parseMomoReceipt(text: string): ParsedTransaction {
   const amountMatch = text.match(RECEIPT_HEADER_AMOUNT);
   const timeMatch = text.match(RECEIPT_TIME);
+  const counterpartyAccount = text.match(RECEIPT_COUNTERPARTY_ACCOUNT)?.groups
+    ?.value;
 
   if (
     !amountMatch?.groups ||
@@ -106,6 +116,7 @@ function parseMomoReceipt(text: string): ParsedTransaction {
     }),
     reference_code: cleanCapturedValue(reference),
     merchant_name: receiptMerchant(header),
+    counterparty_account: cleanAccount(counterpartyAccount),
     parser_rule: 'momo-receipt-v1',
   };
 }
@@ -134,6 +145,9 @@ function parseMomo(text: string, observedAt: string): ParsedTransaction {
     merchant_name: firstValue(
       text,
       isOut ? OUT_MERCHANT_PATTERNS : IN_MERCHANT_PATTERNS,
+    ),
+    counterparty_account: cleanAccount(
+      firstValue(text, COUNTERPARTY_ACCOUNT_PATTERNS),
     ),
     parser_rule: 'momo-v1',
   };

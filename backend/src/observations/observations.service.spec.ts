@@ -21,6 +21,14 @@ const validDto: CreateObservationDto = {
   observedAt: '2026-10-14T12:48:00+07:00',
 };
 
+const counterpartyDto: CreateObservationDto = {
+  ...validDto,
+  rawText:
+    'Số dư TK VCB 9000000001 -40,000 VND lúc 14-10-2026 10:51:42. Số dư 1,079,903 VND. Ref MBVCB.90000000001.9000BFTV00000001.NGUYEN VAN A chuyen khoan nhanh qua Z....CT tu 9000000001 NGUYEN VAN A toi 9000000002 NGUYEN VAN B tai TECHCOMBANK',
+  rawPayload: { fixtureId: 'vcb-out-with-counterparty-001', test: true },
+  observedAt: '2026-10-14T10:51:47+07:00',
+};
+
 function queryChain(result: unknown[]) {
   const chain: any = {};
   chain.from = jest.fn(() => chain);
@@ -91,6 +99,9 @@ describe('ObservationsService', () => {
   let categorizationService: {
     categorize: jest.Mock;
   };
+  let reconciliationService: {
+    evaluate: jest.Mock;
+  };
 
   beforeEach(() => {
     db = {
@@ -114,6 +125,12 @@ describe('ObservationsService', () => {
       })),
     };
 
+    reconciliationService = {
+      evaluate: jest.fn(async () => ({
+        kind: 'NO_MATCH',
+      })),
+    };
+
     categorizationService = {
       categorize: jest.fn(async () => ({
         categoryId: null,
@@ -122,9 +139,14 @@ describe('ObservationsService', () => {
       })),
     };
 
+    /*
+     * Chỉ tạo ObservationsService sau khi tất cả mock
+     * dependency đã được khởi tạo.
+     */
     service = new ObservationsService(
       db,
       deduplicationService as any,
+      reconciliationService as any,
       categorizationService as any,
     );
   });
@@ -202,6 +224,16 @@ describe('ObservationsService', () => {
         direction: 'IN',
         origin: 'PARSER',
       }),
+    );
+    expect(reconciliationService.evaluate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId,
+        walletId,
+        source: 'VIETCOMBANK',
+        amount: 80000,
+        direction: 'IN',
+      }),
+      expect.anything(),
     );
   });
 
@@ -352,6 +384,7 @@ describe('ObservationsService', () => {
         transactionId,
       }),
     );
+    expect(reconciliationService.evaluate).not.toHaveBeenCalled();
   });
 
   it('creates a pending transaction and possible-duplicate link', async () => {
@@ -462,12 +495,19 @@ describe('ObservationsService', () => {
         transactionId: pendingTransaction.id,
       }),
     );
+
+    expect(reconciliationService.evaluate).not.toHaveBeenCalled();
   });
 
   it('stores categorization result on parsed transaction', async () => {
     const categoryId = '11111111-1111-4111-8111-111111111111';
 
-    const pendingObservation = makeObservation();
+    const pendingObservation = {
+      ...makeObservation(),
+      rawText: counterpartyDto.rawText,
+      rawPayload: counterpartyDto.rawPayload,
+      observedAt: new Date(counterpartyDto.observedAt),
+    };
 
     // Giả lập CategorizationService tìm thấy category mặc định.
     categorizationService.categorize = jest.fn(async () => ({
@@ -496,7 +536,7 @@ describe('ObservationsService', () => {
       matchedRuleId: null,
     });
 
-    const result = await service.create(userId, validDto);
+    const result = await service.create(userId, counterpartyDto);
 
     expect(result.duplicate).toBe(false);
 
@@ -508,9 +548,10 @@ describe('ObservationsService', () => {
     expect(categorizationService.categorize).toHaveBeenCalledWith(
       expect.objectContaining({
         userId,
-        direction: 'IN',
+        direction: 'OUT',
         kind: 'NORMAL',
         reviewStatus: 'CONFIRMED',
+        counterpartyAccount: '9000000002',
       }),
       expect.anything(),
     );
@@ -521,11 +562,257 @@ describe('ObservationsService', () => {
         categoryId,
         categorizationSource: 'DEFAULT_KEYWORD',
         matchedRuleId: null,
+        counterpartyAccount: '9000000002',
       }),
     );
 
     // Kiểm tra transaction trả về có kết quả phân loại.
     expect(result.transaction.categoryId).toBe(categoryId);
     expect(result.transaction.categorizationSource).toBe('DEFAULT_KEYWORD');
+  });
+
+  it('auto-confirms a strong internal-transfer match', async () => {
+    const candidateTransactionId = '11111111-1111-4111-8111-111111111111';
+
+    const pendingObservation = makeObservation();
+
+    const internalTransaction = {
+      id: transactionId,
+      userId,
+      walletId,
+
+      categoryId: null,
+
+      amount: 80000,
+      direction: 'IN',
+
+      kind: 'INTERNAL_TRANSFER',
+      reviewStatus: 'CONFIRMED',
+
+      categorizationSource: 'NONE',
+      matchedRuleId: null,
+
+      origin: 'PARSER',
+    };
+
+    const updatedCandidate = {
+      id: candidateTransactionId,
+      userId,
+
+      kind: 'INTERNAL_TRANSFER',
+      reviewStatus: 'CONFIRMED',
+
+      categoryId: null,
+      categorizationSource: 'NONE',
+      matchedRuleId: null,
+    };
+
+    const createdLink = {
+      id: '22222222-2222-4222-8222-222222222222',
+      userId,
+
+      primaryTransactionId: candidateTransactionId,
+      relatedTransactionId: transactionId,
+
+      linkType: 'INTERNAL_TRANSFER',
+      status: 'AUTO_CONFIRMED',
+      confidence: 100,
+    };
+
+    const parsedObservation = {
+      ...makeObservation('PARSED'),
+      transactionId,
+    };
+
+    db.select.mockReturnValueOnce(
+      queryChain([{ id: walletId, isArchived: false }]),
+    );
+
+    db.insert.mockReturnValueOnce(insertChain([pendingObservation]));
+
+    reconciliationService.evaluate = jest.fn(async () => ({
+      kind: 'AUTO_CONFIRMED',
+      reason: 'STRONG_INTERNAL_TRANSFER_MATCH',
+      candidate: {
+        transactionId: candidateTransactionId,
+        walletId: '33333333-3333-4333-8333-333333333333',
+
+        source: 'MBBANK',
+        channel: 'ANDROID_NOTIFICATION',
+
+        timeDeltaMs: 30_000,
+
+        referenceMatched: true,
+        accountMatched: false,
+
+        confidence: 100,
+      },
+    }));
+
+    const transactionInsert = insertChain([internalTransaction]);
+    const linkInsert = linkInsertChain([createdLink]);
+
+    const candidateUpdate = updateChain([updatedCandidate]);
+    const observationUpdate = updateChain([parsedObservation]);
+
+    const insertQueue = [transactionInsert, linkInsert];
+    const updateQueue = [candidateUpdate, observationUpdate];
+
+    const tx = {
+      insert: jest.fn(() => insertQueue.shift()),
+      update: jest.fn(() => updateQueue.shift()),
+    };
+
+    db.transaction.mockImplementation((callback: (value: any) => unknown) =>
+      callback(tx),
+    );
+
+    const result = await service.create(userId, validDto);
+
+    expect(result.duplicate).toBe(false);
+
+    if (result.duplicate) {
+      throw new Error('Expected a new internal transfer.');
+    }
+
+    expect(result.pendingReview).toBe(false);
+    expect(result.transaction.kind).toBe('INTERNAL_TRANSFER');
+    expect(result.transaction.reviewStatus).toBe('CONFIRMED');
+
+    expect(candidateUpdate.set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'INTERNAL_TRANSFER',
+        categoryId: null,
+        categorizationSource: 'NONE',
+        matchedRuleId: null,
+      }),
+    );
+
+    expect(linkInsert.values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        primaryTransactionId: candidateTransactionId,
+        relatedTransactionId: transactionId,
+        linkType: 'INTERNAL_TRANSFER',
+        status: 'AUTO_CONFIRMED',
+        confidence: 100,
+      }),
+    );
+
+    expect(result.reconciliation.kind).toBe('AUTO_CONFIRMED');
+  });
+
+  it('creates a pending internal-transfer review for a weak match', async () => {
+    const candidateTransactionId = '44444444-4444-4444-8444-444444444444';
+
+    const pendingObservation = makeObservation();
+
+    const pendingTransaction = {
+      id: transactionId,
+      userId,
+      walletId,
+
+      categoryId: null,
+
+      amount: 80000,
+      direction: 'IN',
+
+      kind: 'NORMAL',
+      reviewStatus: 'PENDING_REVIEW',
+
+      categorizationSource: 'NONE',
+      matchedRuleId: null,
+
+      origin: 'PARSER',
+    };
+
+    const createdLink = {
+      id: '55555555-5555-4555-8555-555555555555',
+      userId,
+
+      primaryTransactionId: candidateTransactionId,
+      relatedTransactionId: transactionId,
+
+      linkType: 'INTERNAL_TRANSFER',
+      status: 'PENDING_REVIEW',
+      confidence: 85,
+    };
+
+    const reviewedObservation = {
+      ...makeObservation('PENDING_REVIEW'),
+      transactionId,
+    };
+
+    db.select.mockReturnValueOnce(
+      queryChain([{ id: walletId, isArchived: false }]),
+    );
+
+    db.insert.mockReturnValueOnce(insertChain([pendingObservation]));
+
+    reconciliationService.evaluate = jest.fn(async () => ({
+      kind: 'PENDING_REVIEW',
+      reason: 'AMOUNT_TIME_OPPOSITE_DIRECTION',
+      candidates: [
+        {
+          transactionId: candidateTransactionId,
+          walletId: '66666666-6666-4666-8666-666666666666',
+
+          source: 'MBBANK',
+          channel: 'ANDROID_NOTIFICATION',
+
+          timeDeltaMs: 30_000,
+
+          referenceMatched: false,
+          accountMatched: false,
+
+          confidence: 85,
+        },
+      ],
+    }));
+
+    const transactionInsert = insertChain([pendingTransaction]);
+    const linkInsert = linkInsertChain([createdLink]);
+    const observationUpdate = updateChain([reviewedObservation]);
+
+    const insertQueue = [transactionInsert, linkInsert];
+
+    const tx = {
+      insert: jest.fn(() => insertQueue.shift()),
+      update: jest.fn(() => observationUpdate),
+    };
+
+    db.transaction.mockImplementation((callback: (value: any) => unknown) =>
+      callback(tx),
+    );
+
+    const result = await service.create(userId, validDto);
+
+    expect(result.duplicate).toBe(false);
+
+    if (result.duplicate) {
+      throw new Error('Expected a pending internal transfer.');
+    }
+
+    expect(result.pendingReview).toBe(true);
+    expect(result.transaction.kind).toBe('NORMAL');
+    expect(result.transaction.reviewStatus).toBe('PENDING_REVIEW');
+
+    expect(linkInsert.values).toHaveBeenCalledWith([
+      expect.objectContaining({
+        primaryTransactionId: candidateTransactionId,
+        relatedTransactionId: transactionId,
+        linkType: 'INTERNAL_TRANSFER',
+        status: 'PENDING_REVIEW',
+        confidence: 85,
+      }),
+    ]);
+
+    expect(observationUpdate.set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'PENDING_REVIEW',
+        transactionId,
+      }),
+    );
+
+    expect(result.reconciliation.kind).toBe('PENDING_REVIEW');
   });
 });

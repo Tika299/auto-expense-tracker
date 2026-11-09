@@ -14,6 +14,7 @@
       "transaction_time": "2026-10-14T10:51:00+07:00",
       "reference_code": "90000000001",
       "merchant_name": "NGUYEN VAN B",
+      "counterparty_account": "9000000002",
       "parser_rule": "vcb-email-v1"
     }
   },
@@ -32,6 +33,7 @@
       "transaction_time": "2026-10-12T21:14:00+07:00",
       "reference_code": "90000000002",
       "merchant_name": "MOMO_CUA HANG A_NGUYEN VAN C",
+      "counterparty_account": "99MM25044M00000002",
       "parser_rule": "vcb-email-v1"
     }
   },
@@ -50,6 +52,7 @@
       "transaction_time": "2026-10-11T19:31:00+07:00",
       "reference_code": "90000000003",
       "merchant_name": "CUA HANG XANG A",
+      "counterparty_account": "VPLX01000001",
       "parser_rule": "vcb-email-v1"
     }
   },
@@ -68,6 +71,7 @@
       "transaction_time": "2026-10-07T19:17:00+07:00",
       "reference_code": "90000000004",
       "merchant_name": "NGUYEN VAN D",
+      "counterparty_account": "VQRQAFGLK0001",
       "parser_rule": "vcb-email-v1"
     }
   }

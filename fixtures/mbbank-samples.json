@@ -14,6 +14,7 @@
       "transaction_time": "2026-10-28T12:20:00+07:00",
       "reference_code": "BC9000000001",
       "merchant_name": "GIAOHANGTIETKIEM",
+      "counterparty_account": null,
       "parser_rule": "mbbank-notification-v1"
     }
   },
@@ -32,6 +33,7 @@
       "transaction_time": "2026-10-25T09:16:31+07:00",
       "reference_code": null,
       "merchant_name": "DICH VU A",
+      "counterparty_account": null,
       "parser_rule": "mbbank-card-v1"
     }
   },
@@ -50,6 +52,7 @@
       "transaction_time": "2026-10-22T19:22:00+07:00",
       "reference_code": "99MM23309M00000001",
       "merchant_name": "MOMO",
+      "counterparty_account": null,
       "parser_rule": "mbbank-notification-v1"
     }
   },
@@ -68,6 +71,7 @@
       "transaction_time": "2026-10-04T21:05:00+07:00",
       "reference_code": "PMC2618715300000001",
       "merchant_name": "CUA HANG B",
+      "counterparty_account": null,
       "parser_rule": "mbbank-notification-v1"
     }
   },
@@ -86,6 +90,7 @@
       "transaction_time": "2026-10-03T11:11:00+07:00",
       "reference_code": "90000000QR9PA01",
       "merchant_name": "NGUOI NHAN C",
+      "counterparty_account": null,
       "parser_rule": "mbbank-notification-v1"
     }
   },
@@ -104,6 +109,7 @@
       "transaction_time": "2026-10-07T11:47:00+07:00",
       "reference_code": "BC9000000002",
       "merchant_name": "GIAOHANGTIETKIEM",
+      "counterparty_account": null,
       "parser_rule": "mbbank-notification-v1"
     }
   },
@@ -122,6 +128,7 @@
       "transaction_time": "2026-10-25T16:15:00+07:00",
       "reference_code": "900000000001",
       "merchant_name": "MOMO",
+      "counterparty_account": null,
       "parser_rule": "mbbank-notification-v1"
     }
   },
@@ -140,6 +147,7 @@
       "transaction_time": "2026-10-21T12:34:00+07:00",
       "reference_code": "BC9000000003",
       "merchant_name": "GIAOHANGTIETKIEM",
+      "counterparty_account": null,
       "parser_rule": "mbbank-notification-v1"
     }
   }
