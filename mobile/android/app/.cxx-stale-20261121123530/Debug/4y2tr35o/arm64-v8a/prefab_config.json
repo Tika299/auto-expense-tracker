@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "prefabPath": "C:\\Users\\Xuan Vu\\.gradle\\caches\\modules-2\\files-2.1\\com.google.prefab\\cli\\2.1.0\\aa32fec809c44fa531f01dcfb739b5b3304d3050\\cli-2.1.0-all.jar",
+  "packages": [
+    "D:\\auto-expense-tracker\\mobile\\node_modules\\react-native-reanimated\\android\\build\\intermediates\\prefab_package\\debug\\prefab",
+    "D:\\auto-expense-tracker\\mobile\\node_modules\\react-native-worklets\\android\\build\\intermediates\\prefab_package\\debug\\prefab",
+    "C:\\Users\\Xuan Vu\\.gradle\\caches\\9.4.1\\transforms\\62069c6eff9d947102a9611fabf69c07\\transformed\\react-android-0.88.1-debug\\prefab",
+    "C:\\Users\\Xuan Vu\\.gradle\\caches\\9.4.1\\transforms\\c13aedea9aa19b3bd0dd547b24a23340\\transformed\\kolibri-android-0.2.4\\prefab",
+    "C:\\Users\\Xuan Vu\\.gradle\\caches\\9.4.1\\transforms\\dd880d5aa5ce20ca49c859fd3dd57eed\\transformed\\hermes-android-260318099.0.5-debug\\prefab",
+    "C:\\Users\\Xuan Vu\\.gradle\\caches\\9.4.1\\transforms\\c9863d8d8580d5bbbe7d670f1f9c3745\\transformed\\fbjni-0.7.0\\prefab"
+  ]
+}

@@ -1,0 +1,6 @@
+D:\auto-expense-tracker\mobile\node_modules\react-native-gesture-handler\android\CMakeLists.txt
+D:\auto-expense-tracker\mobile\node_modules\react-native-reanimated\Common\NativeView\CMakeLists.txt
+D:\auto-expense-tracker\mobile\node_modules\react-native-safe-area-context\android\src\main\jni\CMakeLists.txt
+D:\auto-expense-tracker\mobile\node_modules\react-native-screens\android\src\main\jni\CMakeLists.txt
+D:\auto-expense-tracker\mobile\node_modules\react-native-worklets\android\build\generated\source\codegen\jni\CMakeLists.txt
+D:\auto-expense-tracker\mobile\node_modules\react-native\ReactAndroid\cmake-utils\default-app-setup\CMakeLists.txt
