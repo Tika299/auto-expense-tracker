@@ -14,6 +14,22 @@ object NotificationExtractor {
     // Chỉ tạo observedAt một lần.
     val observedAt = Instant.now().toString()
 
+    val packageName = sbn.packageName
+    val notificationKey = sbn.key
+    val postTime = sbn.postTime
+
+    if (packageName.isBlank()) {
+      return null
+    }
+
+    if (notificationKey.isBlank()) {
+      return null
+    }
+
+    if (source.packageName != packageName) {
+      return null
+    }
+
     val notification = sbn.notification ?: return null
     val extras = notification.extras
 
@@ -48,6 +64,13 @@ object NotificationExtractor {
       return null
     }
 
+    val sourceMessageId =
+      SourceMessageIdGenerator.generate(
+        packageName = packageName,
+        notificationKey = notificationKey,
+        postTime = postTime,
+      )
+
     val channelId =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         notification.channelId.trimmedOrNull()
@@ -56,9 +79,10 @@ object NotificationExtractor {
       }
 
     return CapturedNotification(
+      sourceMessageId = sourceMessageId,
       source = source,
-      packageName = sbn.packageName,
-      notificationKey = sbn.key,
+      packageName = packageName,
+      notificationKey = notificationKey,
       notificationId = sbn.id,
       channelId = channelId,
       title = title,
@@ -67,7 +91,7 @@ object NotificationExtractor {
       subText = subText,
       textLines = textLines,
       notificationTime =
-        Instant.ofEpochMilli(sbn.postTime).toString(),
+        Instant.ofEpochMilli(postTime).toString(),
       observedAt = observedAt,
       rawText = rawText,
     )

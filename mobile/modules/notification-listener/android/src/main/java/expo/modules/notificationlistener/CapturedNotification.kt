@@ -1,9 +1,10 @@
 package expo.modules.notificationlistener
 
 data class CapturedNotification(
+  val sourceMessageId: String,
   val source: SupportedSource,
   val packageName: String,
-  val notificationKey: String?,
+  val notificationKey: String,
   val notificationId: Int,
   val channelId: String?,
   val title: String?,
