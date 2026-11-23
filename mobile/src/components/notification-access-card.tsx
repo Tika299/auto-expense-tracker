@@ -20,9 +20,14 @@ export default function NotificationAccessCard() {
   const [queueCounts, setQueueCounts] = useState<QueueCounts | null>(null);
 
   const [busy, setBusy] = useState(false);
+
+  const [refreshing, setRefreshing] = useState(false);
+
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
+    setRefreshing(true);
+
     try {
       const [access, paused, counts] = await Promise.all([
         NotificationListener.isNotificationAccessEnabledAsync(),
@@ -36,6 +41,8 @@ export default function NotificationAccessCard() {
       setErrorMessage(null);
     } catch {
       setErrorMessage("Không thể đọc trạng thái Notification Listener.");
+    } finally {
+      setRefreshing(false);
     }
   }, []);
 
@@ -138,13 +145,36 @@ export default function NotificationAccessCard() {
         </Text>
       </View>
 
-      <Pressable
-        accessibilityRole="button"
-        onPress={showAccessExplanation}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Mở cài đặt quyền</Text>
-      </Pressable>
+      <View style={styles.buttonRow}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={showAccessExplanation}
+          style={[styles.button, styles.settingsButton]}
+        >
+          <Text style={styles.buttonText}>Mở cài đặt quyền</Text>
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{
+            disabled: refreshing,
+          }}
+          disabled={refreshing}
+          onPress={() => {
+            void refresh();
+          }}
+          style={({ pressed }) => [
+            styles.button,
+            styles.refreshButton,
+            pressed && styles.buttonPressed,
+            refreshing && styles.buttonDisabled,
+          ]}
+        >
+          <Text style={styles.refreshButtonText}>
+            {refreshing ? "Đang làm mới..." : "Làm mới trạng thái"}
+          </Text>
+        </Pressable>
+      </View>
 
       <View style={styles.switchRow}>
         <View style={styles.switchText}>
@@ -210,16 +240,51 @@ const styles = StyleSheet.create({
   warning: {
     color: "#b45309",
   },
+  buttonRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
+
   button: {
+    flex: 1,
+    minHeight: 48,
     alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 12,
     paddingVertical: 12,
     borderRadius: 10,
+  },
+
+  settingsButton: {
     backgroundColor: "#2563eb",
   },
+
+  refreshButton: {
+    borderWidth: 1,
+    borderColor: "#2563eb",
+    backgroundColor: "#ffffff",
+  },
+
+  buttonPressed: {
+    opacity: 0.75,
+  },
+
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+
   buttonText: {
-    fontSize: 15,
+    textAlign: "center",
+    fontSize: 14,
     fontWeight: "600",
     color: "#ffffff",
+  },
+
+  refreshButtonText: {
+    textAlign: "center",
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#2563eb",
   },
   switchRow: {
     flexDirection: "row",
