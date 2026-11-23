@@ -1,0 +1,15 @@
+package expo.modules.notificationlistener
+
+enum class QueueStatus(
+  val databaseValue: String,
+) {
+  PENDING("PENDING"),
+  WAITING_WALLET("WAITING_WALLET"),
+  SENDING("SENDING"),
+  RETRY_WAIT("RETRY_WAIT"),
+  AUTH_REQUIRED("AUTH_REQUIRED"),
+  SENT("SENT"),
+  SENT_DUPLICATE("SENT_DUPLICATE"),
+  DELIVERED_REJECTED("DELIVERED_REJECTED"),
+  DEAD_LETTER("DEAD_LETTER"),
+}
