@@ -15,6 +15,9 @@ class BankNotificationListenerService :
   private lateinit var walletMappingStore:
     WalletMappingStore
 
+  private lateinit var collectionPreferences:
+    NotificationCollectionPreferences
+
   private lateinit var ioExecutor:
     ExecutorService
 
@@ -28,6 +31,11 @@ class BankNotificationListenerService :
 
     walletMappingStore =
       WalletMappingStore(
+        applicationContext,
+      )
+
+    collectionPreferences =
+      NotificationCollectionPreferences(
         applicationContext,
       )
 
@@ -45,6 +53,10 @@ class BankNotificationListenerService :
     super.onNotificationPosted(sbn)
 
     val postedNotification = sbn ?: return
+
+    if (collectionPreferences.isPaused()) {
+      return
+    }
 
     val source =
       SupportedSource.fromPackageName(

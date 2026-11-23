@@ -1,27 +1,19 @@
-export type NotificationSource =
-  | 'VIETCOMBANK'
-  | 'MBBANK'
-  | 'MOMO';
+export type NotificationSource = "VIETCOMBANK" | "MBBANK" | "MOMO";
 
 export type NotificationQueueStatus =
-  | 'PENDING'
-  | 'WAITING_WALLET'
-  | 'SENDING'
-  | 'RETRY_WAIT'
-  | 'AUTH_REQUIRED'
-  | 'SENT'
-  | 'SENT_DUPLICATE'
-  | 'DELIVERED_REJECTED'
-  | 'DEAD_LETTER';
+  | "PENDING"
+  | "WAITING_WALLET"
+  | "SENDING"
+  | "RETRY_WAIT"
+  | "AUTH_REQUIRED"
+  | "SENT"
+  | "SENT_DUPLICATE"
+  | "DELIVERED_REJECTED"
+  | "DEAD_LETTER";
 
-export type QueueCounts = Record<
-  NotificationQueueStatus,
-  number
->;
+export type QueueCounts = Record<NotificationQueueStatus, number>;
 
-export type WalletMappings = Partial<
-  Record<NotificationSource, string>
->;
+export type WalletMappings = Partial<Record<NotificationSource, string>>;
 
 export type SetWalletMappingResult = {
   source: NotificationSource;
@@ -33,6 +25,14 @@ export type NotificationListenerNativeModule = {
   getModuleName(): string;
 
   pingAsync(): Promise<boolean>;
+
+  isNotificationAccessEnabledAsync(): Promise<boolean>;
+
+  openNotificationAccessSettingsAsync(): Promise<boolean>;
+
+  getCollectionPausedAsync(): Promise<boolean>;
+
+  setCollectionPausedAsync(paused: boolean): Promise<boolean>;
 
   setWalletMappingAsync(
     source: NotificationSource,

@@ -5,6 +5,7 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import java.time.Instant
 import java.util.UUID
+import expo.modules.kotlin.functions.Queues
 
 class NotificationListenerModule : Module() {
 
@@ -88,6 +89,41 @@ class NotificationListenerModule : Module() {
           repository.close()
         }
       }
+
+      AsyncFunction(
+        "isNotificationAccessEnabledAsync",
+      ) {
+        NotificationAccessManager(
+          requireApplicationContext(),
+        ).isAccessGranted()
+      }
+
+      AsyncFunction(
+        "openNotificationAccessSettingsAsync",
+      ) {
+        NotificationAccessManager(
+          requireApplicationContext(),
+        ).openAccessSettings()
+      }.runOnQueue(Queues.MAIN)
+
+      AsyncFunction(
+        "getCollectionPausedAsync",
+      ) {
+        NotificationCollectionPreferences(
+          requireApplicationContext(),
+        ).isPaused()
+      }
+
+      AsyncFunction(
+        "setCollectionPausedAsync",
+      ) { paused: Boolean ->
+        NotificationCollectionPreferences(
+          requireApplicationContext(),
+        ).setPaused(paused)
+
+        paused
+      }
+
     }
 
   private fun requireApplicationContext(): Context {
